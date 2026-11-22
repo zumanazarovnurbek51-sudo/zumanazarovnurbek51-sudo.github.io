@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEMTUR — база школы</title>
+<meta name="description" content="TEMTUR — учёт учеников, оплат, посещений и зарплат частной школы.">
+<meta name="theme-color" content="#0F1E33">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="TEMTUR — база школы">
+<meta property="og:description" content="Ученики, оплаты, посещения и финансы школы. Вход по почте и паролю.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src https://rqpttmkqpbjxtpfowolf.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'; manifest-src 'self'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 38'%3E%3Crect width='38' height='38' rx='9' fill='%2308769A'/%3E%3Crect x='9' y='9' width='20' height='4.5' rx='1' fill='%23F2B705'/%3E%3Crect x='16.25' y='13.5' width='5.5' height='15' fill='%23fff'/%3E%3Crect x='12' y='28.5' width='14' height='2.5' rx='1' fill='%23fff' fill-opacity='.7'/%3E%3C/svg%3E">
+<style>
+/* TEMTUR — рабочая база частной школы.
+   Идея: чертёж. Тёмно-синяя «рамка» навигации, светлый лист с тонкой сеткой линий,
+   лазурь и золото — от флага Казахстана. Красный — только для долгов и просрочек.
+   Шрифт — системный (без внешних запросов), цифры табличные. */
+:root{color-scheme:light;
+ --canvas:#EEF2F6;--surface:#FFFFFF;--surface-2:#F5F7FA;--ink:#0F1E33;--ink-2:#46586F;--ink-3:#738398;
+ --line:#D9E1EA;--line-2:#E8EDF2;--nav:#0F1E33;--nav-2:#16294A;--nav-ink:#BCC8D9;--nav-ink-2:#7F92AC;
+ --azure:#08769A;--azure-ink:#FFFFFF;--azure-soft:#E1F1F6;--azure-line:#B7DCE8;--gold:#F2B705;
+ --red:#C62828;--red-soft:#FCEBEB;--amber:#9A5200;--amber-soft:#FFF2DC;--green:#1B7A4B;--green-soft:#E3F3EA;
+ --s1:#2a78d6;--s2:#eb6834;--ring:0 0 0 3px #B7DCE8;
+ --shadow:0 1px 2px rgba(15,30,51,.05),0 12px 32px -18px rgba(15,30,51,.28);
+ --font:"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,"Helvetica Neue",Arial,sans-serif;
+ --font-d:"Segoe UI Variable Display","Segoe UI",-apple-system,BlinkMacSystemFont,"SF Pro Display",Roboto,"Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;
+ --canvas:#0B131D;--surface:#121D2B;--surface-2:#172435;--ink:#E6ECF3;--ink-2:#A8B6C8;--ink-3:#7D8DA2;
+ --line:#22324A;--line-2:#1B2A3D;--nav:#08101A;--nav-2:#0F1C2E;--azure:#3FB2D6;--azure-ink:#04202B;--azure-soft:#0F2E3B;--azure-line:#1E5266;
+ --red:#FF7B7B;--red-soft:#3A1818;--amber:#F2B255;--amber-soft:#33240E;--green:#5CCB93;--green-soft:#11291C;
+ --s1:#3987e5;--s2:#d95926;--ring:0 0 0 3px #1E5266;--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px -18px rgba(0,0,0,.6)}}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.5 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+a{color:var(--azure)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- оболочка ---------- */
+.app{display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh;background:linear-gradient(90deg,var(--nav) 0 256px,transparent 256px)}
+.side{position:sticky;top:0;height:100vh;background:var(--nav);color:var(--nav-ink);display:flex;flex-direction:column;padding:18px 14px 14px;overflow-y:auto;z-index:15}
+.logo{display:flex;align-items:center;gap:12px;padding:4px 8px 18px;color:#fff;text-decoration:none}
+.logo svg{width:38px;height:38px;flex:none}
+.logo b{display:block;font:700 18px/1.1 var(--font-d);letter-spacing:.06em}
+.logo small{display:block;color:var(--nav-ink-2);font-size:12px;margin-top:3px;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.ng{font-size:12px;color:var(--nav-ink-2);padding:14px 10px 5px}
+#nav a{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:8px;color:var(--nav-ink);text-decoration:none;font-weight:500;position:relative}
+#nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+#nav a.on{background:rgba(255,255,255,.1);color:#fff}
+#nav a.on::before{content:"";position:absolute;left:-14px;top:7px;bottom:7px;width:3px;border-radius:0 3px 3px 0;background:var(--gold)}
+#nav a:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.me{border-top:1px solid rgba(255,255,255,.08);margin-top:14px;padding:14px 6px 2px;display:flex;align-items:center;gap:10px}
+.me .who-t{flex:1;min-width:0;font-size:13px;line-height:1.3;color:#fff}
+.me .who-t span{display:block;color:var(--nav-ink-2);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me button{background:transparent;border:0;color:var(--nav-ink);min-height:36px;padding:0 8px;border-radius:8px}
+.me button:hover{background:rgba(255,255,255,.08);color:#fff}
+.main{min-width:0;padding:26px clamp(16px,3vw,40px) 56px;max-width:1440px;width:100%}
+.topbar,.tabbar,.scrim{display:none}
+.preview{background:var(--amber-soft);color:var(--amber);border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:16px}
+
+/* ---------- заголовок страницы ---------- */
+.ph{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;margin-bottom:22px}
+.ph h1{margin:0;font:650 28px/1.15 var(--font-d);letter-spacing:-.01em}
+.ph p{margin:5px 0 0;color:var(--ink-2)}
+.ph .tools{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+h2{font:650 17px/1.3 var(--font-d);margin:0}
+h3{font:650 15px/1.3 var(--font-d);margin:22px 0 10px}
+
+/* ---------- панели, сетка цифр ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.panel+.panel{margin-top:16px}
+.panel-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:14px 18px;border-bottom:1px solid var(--line-2)}
+.panel-h h2{flex:1 1 auto}
+.panel-h .meta{color:var(--ink-3);font-size:13px;flex:0 1 auto}
+.panel-b{padding:16px 18px}
+.scroll{overflow-x:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px}
+.kpi{background:var(--surface);padding:16px 18px 15px}
+.kpi .v{font:650 26px/1.1 var(--font-d);font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.01em}
+.kpi .l{color:var(--ink-2);font-size:13px;margin-top:6px}
+.kpi.alert .v{color:var(--red)}
+.kpi.good .v{color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;align-items:start}
+.grid>.panel+.panel{margin-top:0}
+.stack-gap>*+*{margin-top:16px}
+
+/* ---------- таблицы ---------- */
+table{width:100%;border-collapse:separate;border-spacing:0}
+th{font-size:12.5px;font-weight:600;color:var(--ink-3);text-align:start;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--surface-2)}
+tr.late td:first-child{box-shadow:inset 3px 0 0 var(--red)}
+.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.nw{white-space:nowrap}
+.muted{color:var(--ink-3)}
+.sm{font-size:13px}
+.red{color:var(--red)}
+.who{display:flex;align-items:center;gap:11px;min-width:0}
+.who>div>b{font-weight:600;display:block}
+.who>div>span{display:block;color:var(--ink-3);font-size:12.5px;white-space:nowrap}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;font:650 12.5px/1 var(--font-d);letter-spacing:.02em}
+.av.c0{background:#E1F1F6;color:#08607E}.av.c1{background:#FFF0D0;color:#7A5300}.av.c2{background:#E9E6FB;color:#4B3BB0}
+.av.c3{background:#E3F3EA;color:#1B6B43}.av.c4{background:#FCE8EF;color:#A53266}.av.c5{background:#E7ECF2;color:#3B4D66}
+@media (prefers-color-scheme:dark){.av.c0{background:#0F3646;color:#8FD8EE}.av.c1{background:#3A2C0A;color:#F5CF6E}.av.c2{background:#262046;color:#B5ACF5}.av.c3{background:#12321F;color:#86DDB0}.av.c4{background:#3B1626;color:#F2A3C3}.av.c5{background:#1F2B3C;color:#B5C3D6}}
+.empty{padding:36px 20px;text-align:center;color:var(--ink-3)}
+.empty b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+
+/* ---------- метки ---------- */
+.tag{display:inline-block;font-size:12.5px;font-weight:500;padding:2px 8px;border-radius:6px;background:var(--azure-soft);color:var(--azure);margin:2px 4px 2px 0;white-space:nowrap}
+.tag.g{background:var(--surface-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line)}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:3px 10px 3px 9px;border-radius:999px;white-space:nowrap;line-height:1.5}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.pill.late{background:var(--red-soft);color:var(--red)}
+.pill.soon{background:var(--amber-soft);color:var(--amber)}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.pill.wait{background:var(--surface-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line)}
+.note{background:var(--amber-soft);color:var(--amber);border-radius:10px;padding:11px 14px;margin:0 0 16px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.status{padding:11px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);color:var(--ink-2);margin-bottom:16px}
+.status.err{background:var(--red-soft);border-color:transparent;color:var(--red)}
+.sample{font-size:13px;color:var(--ink-3);margin:10px 0 0}
+
+/* ---------- кнопки и поля ---------- */
+button,.btn{font:inherit;font-weight:600;font-size:14px;min-height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;text-decoration:none}
+button:hover{border-color:var(--ink-3)}
+button:disabled{opacity:.55;cursor:default}
+button.pri{background:var(--azure);border-color:var(--azure);color:var(--azure-ink)}
+button.pri:hover{filter:brightness(1.08)}
+button.danger{color:var(--red)}
+button.link{border:0;background:none;color:var(--azure);padding:0 6px;min-height:32px;font-weight:600}
+button.link:hover{text-decoration:underline}
+button.link.danger{color:var(--red)}
+button.icon{padding:0;width:40px}
+button.sm{min-height:34px;padding:0 11px;font-size:13px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.cg:focus-visible{outline:none;box-shadow:var(--ring)}
+input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 11px;min-height:40px;width:100%}
+input:hover,select:hover,textarea:hover{border-color:var(--ink-3)}
+textarea{min-height:84px;resize:vertical}
+label{display:block;font-size:13px;font-weight:500;color:var(--ink-2)}
+label>input,label>select,label>textarea{margin-top:5px}
+.req::after{content:" *";color:var(--red)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.bar .grow{flex:1 1 240px}
+.bar select{width:auto;flex:0 1 210px}
+.search{position:relative}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink-3)}
+.search input{padding-left:36px}
+.search>input{margin-top:0}
+@media (max-width:1250px) and (min-width:901px){.week{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px 16px}
+.acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:22px}
+.check{display:flex;gap:12px;align-items:flex-start;color:var(--ink);font-size:14px;font-weight:400;padding:8px 0}
+.check input{width:20px;min-height:20px;height:20px;margin:1px 0 0;accent-color:var(--azure);flex:none}
+.switch{position:relative;display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);font-weight:500;cursor:pointer}
+.switch input{appearance:none;-webkit-appearance:none;width:38px;height:22px;min-height:22px;border-radius:999px;background:var(--line);border:0;padding:0;margin:0;position:relative;cursor:pointer;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked{background:var(--green)}
+.switch input:checked::after{transform:translateX(16px)}
+.switch.dim{opacity:.45;cursor:default}.switch input:disabled{cursor:default}
+label small{display:block;margin-top:5px;font-size:12px;font-weight:400;color:var(--ink-3)}
+.pwrow{display:flex;gap:8px;margin-top:5px}.pwrow input{margin-top:0;flex:1;min-width:0;font-variant-numeric:tabular-nums;letter-spacing:.02em}.pwrow button{flex:none}
+.login{display:inline-block;padding:2px 8px;border-radius:6px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);font-weight:600;font-size:13px;color:var(--ink);word-break:break-all}
+table.users tr.off .who,table.users tr.off .login{opacity:.55}
+table.users td{vertical-align:middle}
+.row-acts{display:inline-flex;flex-wrap:wrap;gap:2px 4px;justify-content:flex-end}.row-acts .i{width:16px;height:16px;margin-right:4px;vertical-align:-3px}
+.rights{border-top:1px solid var(--line-2);font-size:13.5px;color:var(--ink-2)}.rights p{margin:0 0 6px}.rights b{color:var(--ink)}
+fieldset.perms{border:1px solid var(--line);border-radius:10px;padding:8px 14px 12px;margin:18px 0 0}fieldset.perms legend{padding:0 6px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.cred{display:grid;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}.cred div{display:flex;justify-content:space-between;gap:16px;align-items:baseline;flex-wrap:wrap}.cred span{color:var(--ink-3);font-size:13px}.cred b{font-size:18px;letter-spacing:.02em;user-select:all;word-break:break-all}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px;margin-bottom:18px}
+.quick button{min-height:56px;justify-content:flex-start;padding:0 16px;font-size:15px;background:var(--surface)}
+.quick button svg{width:20px;height:20px;color:var(--azure)}
+.quick button.pri{background:var(--azure);border-color:var(--azure);color:var(--azure-ink)}
+.quick button.pri svg{color:inherit}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px;background:var(--surface-2);flex-wrap:wrap}
+.seg button{border:0;min-height:36px;background:transparent;color:var(--ink-2);border-radius:7px;padding:0 13px}
+.seg button[aria-pressed="true"]{background:var(--azure);color:var(--azure-ink)}
+.seg button[aria-pressed="true"][data-m="sick"]{background:var(--amber);color:#fff}
+.seg button[aria-pressed="true"][data-m="absent"]{background:var(--red);color:#fff}
+@media (prefers-color-scheme:dark){.seg button[aria-pressed="true"][data-m="sick"],.seg button[aria-pressed="true"][data-m="absent"]{color:#1a0d00}}
+
+/* ---------- расписание и таймлайн ---------- */
+.week{display:grid;grid-template-columns:repeat(var(--days,6),minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.day{background:var(--surface);min-height:220px;display:flex;flex-direction:column}
+.day-h{padding:11px 12px;border-bottom:1px solid var(--line-2);font-weight:650;font-family:var(--font-d);display:flex;justify-content:space-between;gap:6px}
+.day-h span{color:var(--ink-3);font-weight:500;font-size:13px}
+.day.today .day-h{box-shadow:inset 0 3px 0 var(--gold)}
+.day-b{padding:8px;display:flex;flex-direction:column;gap:8px}
+.lesson{border:1px solid var(--azure-line);background:var(--azure-soft);border-radius:8px;padding:8px 10px;font-size:13px}
+.lesson.ind{background:var(--surface-2);border-color:var(--line)}
+.lesson .t{font-weight:700;font-variant-numeric:tabular-nums}
+.lesson .s{font-weight:600}
+.lesson .who-list{margin-top:4px;display:flex;flex-wrap:wrap;gap:2px 8px}
+.lesson .who-list button{padding:0;min-height:24px;font-weight:500;font-size:13px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;padding:12px 18px;border-bottom:1px solid var(--line-2)}
+.tl li:last-child{border-bottom:0}
+.tl .time{font:650 17px/1.2 var(--font-d);font-variant-numeric:tabular-nums}
+.tl .ttl{font-weight:600}
+.tl .sub{color:var(--ink-3);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.chip{font-size:12.5px;padding:2px 8px;border-radius:6px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink-2)}
+.chip.present{background:var(--green-soft);color:var(--green);box-shadow:none}
+.chip.sick{background:var(--amber-soft);color:var(--amber);box-shadow:none}
+.chip.absent{background:var(--red-soft);color:var(--red);box-shadow:none}
+.att-g+.att-g{margin-top:14px}
+
+/* ---------- график ---------- */
+.chart{padding:14px 18px 16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink-2);margin-bottom:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.plot{position:relative;height:210px;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px;align-items:end;padding-left:60px;border-bottom:1px solid var(--line)}
+.plot .gl{position:absolute;left:60px;right:0;border-top:1px dashed var(--line);pointer-events:none}
+.plot .gl span{position:absolute;left:-60px;width:54px;white-space:nowrap;top:-9px;font-size:11.5px;line-height:1.4;color:var(--ink-3);text-align:right}
+.cg{position:relative;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;outline:none;border-radius:6px}
+.cg:hover{background:var(--surface-2)}
+.cg .b{width:min(22px,40%);border-radius:4px 4px 0 0;min-height:2px}
+.cg .b1{background:var(--s1)}.cg .b2{background:var(--s2)}
+.cg .tt{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);font-size:12.5px;line-height:1.45;padding:8px 10px;border-radius:8px;white-space:nowrap;z-index:3;box-shadow:var(--shadow)}
+.cg:hover .tt,.cg:focus .tt{display:block}
+.cg:first-child .tt{left:0;transform:none}.cg:last-child .tt{left:auto;right:0;transform:none}
+.xl{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:10px;margin-top:6px;padding-left:60px;font-size:12.5px;color:var(--ink-3);text-align:center}
+.xl b{display:block;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;font-size:12.5px}
+.hbar{margin:4px 0 14px}
+.hbar .row{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.hbar .track{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin-top:5px;box-shadow:inset 0 0 0 1px var(--line-2)}
+.hbar .fill{height:100%;background:var(--s1);border-radius:4px}
+
+/* ---------- окно (боковой лист) ---------- */
+.ov{position:fixed;inset:0;background:rgba(9,17,28,.45);display:none;justify-content:flex-end;z-index:40}
+.ov.open{display:flex}
+.dlg{background:var(--surface);width:min(800px,100%);height:100%;overflow-y:auto;box-shadow:-24px 0 60px rgba(0,0,0,.22);animation:sheet .2s ease-out;overscroll-behavior:contain}
+.ov.center{justify-content:center;align-items:center;padding:16px}
+.ov.center .dlg{height:auto;max-height:90vh;width:min(470px,100%);border-radius:14px;animation:pop .16s ease-out}
+@keyframes sheet{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+@keyframes pop{from{transform:scale(.97);opacity:.6}to{transform:none;opacity:1}}
+.dlg-h{position:sticky;top:0;z-index:2;background:var(--surface);display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.dlg-h h2{font:650 21px/1.25 var(--font-d);flex:1;margin:0;overflow-wrap:anywhere}
+#dlgB{padding:20px 24px 30px}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.sum>div{background:var(--surface);padding:12px 14px}
+.sum .l{font-size:12.5px;color:var(--ink-3)}
+.sum .v{font:650 19px/1.25 var(--font-d);font-variant-numeric:tabular-nums;margin-top:3px}
+.sum .v.red{color:var(--red)}
+.calc{background:var(--azure-soft);border-radius:10px;padding:12px 14px;margin-top:12px;font-size:14px}
+.calc b{font-variant-numeric:tabular-nums}
+dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px 18px;margin:0}
+dl>div{min-width:0}
+dt{font-size:12.5px;color:var(--ink-3)}
+dd{margin:2px 0 0;overflow-wrap:anywhere}
+.enr-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,1fr) auto;gap:10px;align-items:end;padding:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:var(--surface-2)}
+.slots{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:4px}
+.slot{display:inline-flex;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:3px 4px 3px 6px}
+.slot select,.slot input{width:auto;min-height:32px;padding:4px 8px;margin:0;border:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;max-width:90vw;box-shadow:var(--shadow);font-weight:500}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.no-own .own,.no-fin .fin{display:none!important}
+.no-del [data-act="st-del"],.no-del [data-act="pay-del"],.no-del [data-act="exp-del"],.no-del [data-act="t-del"],.no-del [data-act="s-del"],.no-del [data-act="ch-edit"]{display:none!important}
+
+/* ---------- вход ---------- */
+.auth{position:fixed;inset:0;z-index:50;display:none;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);background:var(--canvas);overflow-y:auto}
+.auth-art{background:var(--nav);color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:40px 44px;min-height:100%;
+ background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+ background-size:96px 96px,96px 96px,24px 24px,24px 24px}
+.auth-art .brand{display:flex;align-items:center;gap:14px}
+.auth-art .brand svg{width:44px;height:44px}
+.auth-art .brand b{font:700 22px/1 var(--font-d);letter-spacing:.08em}
+.auth-art .draw{width:100%;max-width:560px;margin:28px auto;display:block}
+.auth-art h1{font:650 clamp(30px,3.4vw,44px)/1.08 var(--font-d);margin:0;letter-spacing:-.015em;max-width:15ch}
+.auth-art p{color:var(--nav-ink);margin:12px 0 0;max-width:42ch}
+.auth-side{display:grid;place-items:center;padding:32px 20px}
+.auth-card{width:min(400px,100%)}
+.auth-card h2{font:650 26px/1.2 var(--font-d);margin:0 0 6px}
+.auth-card .sub{color:var(--ink-2);margin:0 0 22px}
+.auth-card form>label+label{margin-top:14px}
+.auth-card .full{width:100%;min-height:46px;font-size:15px;margin-top:20px}
+.auth-card .alt{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:16px;font-size:14px}
+.auth-card .code{letter-spacing:.4em;font:600 22px/1 var(--font-d);text-align:center}
+.auth-msg{min-height:1.4em;margin:12px 0 0;font-size:14px}
+.auth-msg.err{color:var(--red)}.auth-msg.ok{color:var(--green)}
+.mob-brand{display:none}
+
+/* ---------- телефон и планшет ---------- */
+@media (max-width:900px){
+ .app{display:block}
+ .app{background:none}
+ .side{position:fixed;left:0;top:0;bottom:0;width:min(290px,84vw);transform:translateX(-102%);transition:transform .22s ease-out,visibility .22s;visibility:hidden}
+ .side.open{transform:none;visibility:visible;box-shadow:24px 0 60px rgba(0,0,0,.3)}
+ .scrim.open{display:block;position:fixed;inset:0;background:rgba(9,17,28,.45);z-index:14}
+ .topbar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:12;background:var(--nav);color:#fff;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top))}
+ .topbar button{background:transparent;border:0;color:#fff;width:40px;padding:0}
+ .topbar b{font:700 16px/1 var(--font-d);letter-spacing:.06em;flex:1}
+ .topbar svg.logo-s{width:28px;height:28px}
+ .main{padding:18px 14px calc(96px + env(safe-area-inset-bottom))}
+ .tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:12;background:var(--surface);border-top:1px solid var(--line);padding:4px 4px max(4px,env(safe-area-inset-bottom))}
+ .tabbar a,.tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--ink-3);text-decoration:none;padding:6px 2px;min-height:52px;border:0;background:none;border-radius:8px}
+ .tabbar .on{color:var(--azure)}
+ .tabbar svg.i{width:22px;height:22px}
+ .ph h1{font-size:23px}
+ .ph .tools{margin-left:0;width:100%}
+ .week{grid-template-columns:minmax(0,1fr)}
+ .day{min-height:0}
+ .ov .dlg{width:100%}
+ .dlg-h{padding:12px 16px}
+ #dlgB{padding:16px 16px 28px}
+ .auth{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
+ .auth-art{padding:22px 22px 26px;min-height:0}
+ .auth-art .draw{display:none}
+ .auth-art h1{font-size:26px;margin-top:18px}
+ .auth-art p{display:none}
+ .auth-side{place-items:start center;padding-top:28px}
+ .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quick button{min-height:64px;white-space:normal;text-align:left;line-height:1.25}
+}
+@media (max-width:600px){
+ table{font-size:14px}
+ .stack thead{display:none}
+ .stack tr{display:grid;padding:10px 0;border-bottom:1px solid var(--line-2)}
+ .stack tbody tr:last-child{border-bottom:0}
+ .stack td{display:flow-root;border:0;padding:3px 14px;padding-left:calc(7.5em + 14px);text-align:start}
+ .stack td::before{content:attr(data-l);float:left;width:7em;margin-left:-7.5em;color:var(--ink-3);font-size:13px}
+ .stack td:empty{display:none}
+ .stack td.num{text-align:start}
+ .stack td.nolab{padding-left:14px}.stack td.nolab::before{display:none}
+ .enr-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .enr-row .full{grid-column:1/-1}
+ .kpi .v{font-size:21px}
+ .kpi{padding:13px 14px}
+ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stack td.nolab{padding-top:4px;padding-bottom:4px}
+ .seg button{padding:0 10px}
+ .bar select{flex:1 1 140px}
+ button,input,select{min-height:44px}
+ .plot{height:170px;gap:4px}.xl{gap:4px}
+ .cg .tt{white-space:normal;width:180px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="9" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="5" rx="1.5"/><rect x="13.5" y="11.5" width="7" height="9" rx="1.5"/><rect x="3.5" y="15.5" width="7" height="5" rx="1.5"/></symbol>
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 20V12M10 20V5M16 20v-9M21 20H3"/></symbol>
+ <symbol id="i-students" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.7-3.6 3.3-5.6 6.5-5.6s5.8 2 6.5 5.6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14.6c2.2 0 3.7 1.5 4.2 4"/></symbol>
+ <symbol id="i-pay" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19M6.5 15h3"/></symbol>
+ <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+ <symbol id="i-att" viewBox="0 0 24 24"><path d="M10 6.5h10M10 12h10M10 17.5h10"/><path d="M3.5 6.5l1.5 1.5 2.5-3M3.5 12l1.5 1.5 2.5-3M3.5 17.5l1.5 1.5 2.5-3"/></symbol>
+ <symbol id="i-teach" viewBox="0 0 24 24"><path d="M2 9.5l10-5 10 5-10 5z"/><path d="M6 11.5v4.5c0 1.6 2.7 3 6 3s6-1.4 6-3v-4.5M22 9.5v5"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24"><path d="M3.5 5h6a2.5 2.5 0 0 1 2.5 2.5V20a2 2 0 0 0-2-2H3.5zM20.5 5h-6A2.5 2.5 0 0 0 12 7.5V20a2 2 0 0 1 2-2h6.5z"/></symbol>
+ <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="6.5" rx="5.5" ry="2.5"/><path d="M3.5 6.5v4.5c0 1.4 2.5 2.5 5.5 2.5M3.5 11v4.5c0 1.4 2.5 2.5 5.5 2.5"/><ellipse cx="15.5" cy="13" rx="5" ry="2.3"/><path d="M10.5 13v4.2c0 1.3 2.2 2.3 5 2.3s5-1 5-2.3V13"/></symbol>
+ <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></symbol>
+ <symbol id="i-cog" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+ <symbol id="i-out" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8.5-8.5M16 7l2.5 2.5M14 9l2 2"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol><symbol id="i-dice" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+ <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+ <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+ <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+ <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+ <symbol id="i-mark" viewBox="0 0 38 38"><rect width="38" height="38" rx="9" fill="#08769A" stroke="none"/><rect x="9" y="9" width="20" height="4.5" rx="1" fill="#F2B705" stroke="none"/><rect x="16.25" y="13.5" width="5.5" height="15" fill="#fff" stroke="none"/><rect x="12" y="28.5" width="14" height="2.5" rx="1" fill="#fff" fill-opacity=".7" stroke="none"/></symbol>
+</svg>
+<div class="app">
+ <aside class="side" id="side" aria-label="Разделы">
+  <a class="logo" href="#panel"><svg aria-hidden="true"><use href="#i-mark"/></svg><span><b>TEMTUR</b><small id="schoolName">TEMTUR</small></span></a>
+  <nav id="nav">
+   <div class="ng">Работа</div>
+   <a href="#panel" data-v="panel"><svg class="i"><use href="#i-panel"/></svg>Панель</a>
+   <a href="#home" data-v="home" class="own"><svg class="i"><use href="#i-home"/></svg>Главная</a>
+   <a href="#students" data-v="students"><svg class="i"><use href="#i-students"/></svg>Ученики</a>
+   <a href="#payments" data-v="payments"><svg class="i"><use href="#i-pay"/></svg>Оплаты</a>
+   <a href="#schedule" data-v="schedule"><svg class="i"><use href="#i-cal"/></svg>Расписание</a>
+   <a href="#attendance" data-v="attendance"><svg class="i"><use href="#i-att"/></svg>Посещения</a>
+   <div class="ng">Школа</div>
+   <a href="#teachers" data-v="teachers"><svg class="i"><use href="#i-teach"/></svg>Учителя</a>
+   <a href="#subjects" data-v="subjects"><svg class="i"><use href="#i-book"/></svg>Предметы</a>
+   <div class="ng fin">Деньги</div>
+   <a href="#salary" data-v="salary" class="fin"><svg class="i"><use href="#i-coins"/></svg>Зарплаты</a>
+   <a href="#finance" data-v="finance" class="fin"><svg class="i"><use href="#i-trend"/></svg>Финансы</a>
+   <div class="ng own">Управление</div>
+   <a href="#nastroiki" data-v="nastroiki" class="own"><svg class="i"><use href="#i-cog"/></svg>Настройки</a>
+  </nav>
+  <div class="me" id="who"></div>
+ </aside>
+ <div class="scrim" id="scrim" data-act="menu-close"></div>
+ <div>
+  <header class="topbar"><button data-act="menu" aria-label="Открыть меню"><svg class="i"><use href="#i-menu"/></svg></button><svg class="logo-s" aria-hidden="true"><use href="#i-mark"/></svg><b>TEMTUR</b></header>
+  <main class="main"><div class="preview" id="preview" style="display:none"><span>Вы смотрите базу глазами администратора без дополнительных прав.</span><button data-act="preview-off">Вернуться к виду владельца</button></div><div id="status" class="status">Загружаю базу…</div><div id="main"></div></main>
+ </div>
+ <nav class="tabbar" id="tabbar" aria-label="Быстрые разделы">
+  <a href="#panel" data-v="panel"><svg class="i"><use href="#i-panel"/></svg>Панель</a>
+  <a href="#students" data-v="students"><svg class="i"><use href="#i-students"/></svg>Ученики</a>
+  <a href="#payments" data-v="payments"><svg class="i"><use href="#i-pay"/></svg>Оплаты</a>
+  <a href="#attendance" data-v="attendance"><svg class="i"><use href="#i-att"/></svg>Посещения</a>
+  <button data-act="menu"><svg class="i"><use href="#i-more"/></svg>Ещё</button>
+ </nav>
+</div>
+<div class="ov" id="ov"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgT" tabindex="-1" style="outline:none"><div class="dlg-h"><h2 id="dlgT"></h2><button class="icon" data-act="close" aria-label="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div><div id="dlgB"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="auth" class="auth">
+ <section class="auth-art" aria-hidden="true">
+  <div class="brand"><svg><use href="#i-mark"/></svg><b>TEMTUR</b></div>
+  <svg class="draw" viewBox="0 0 560 380" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <g stroke="#5CC6E6" stroke-width="1" opacity=".55">
+    <path d="M110 356H450M110 350v12M450 350v12M30 214v116M24 214h12M24 330h12"/>
+   </g>
+   <text x="280" y="374" fill="#5CC6E6" opacity=".8" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">18 000</text>
+   <text x="14" y="276" fill="#5CC6E6" opacity=".8" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial" transform="rotate(-90 14 276)">6 200</text>
+   <g stroke="#ffffff" stroke-width="1" opacity=".22"><path d="M8 330H552"/><path d="M60 330V214H110M450 214H500V330"/></g>
+   <g stroke="#F2B705" stroke-width="1.6">
+    <path d="M96 170L280 92L464 170Z"/>
+    <path d="M110 170H450V330H110Z"/>
+    <path d="M118 194H442"/>
+    <circle cx="280" cy="140" r="15"/>
+    <path d="M280 125v30M265 140h30"/>
+    <path d="M280 92V44M280 44l34 8-34 9"/>
+   </g>
+   <g stroke="#F2B705" stroke-width="1.3" opacity=".9">
+    <path d="M150 200v118M166 200v118M146 200h24M146 318h24M202 200v118M218 200v118M198 200h24M198 318h24M342 200v118M358 200v118M338 200h24M338 318h24M394 200v118M410 200v118M390 200h24M390 318h24"/>
+    <path d="M262 330V276a18 18 0 0 1 36 0V330M280 258v72"/>
+    <path d="M238 330h84v8h-84zM228 338h104v8H228z"/>
+   </g>
+   <g stroke="#ffffff" stroke-width="1" opacity=".35">
+    <path d="M70 232h30v34H70zM70 278h30v34H70zM460 232h30v34h-30zM460 278h30v34h-30zM85 232v34M85 278v34M475 232v34M475 278v34"/>
+    <path d="M238 214h12v40h-12zM310 214h12v40h-12z"/>
+   </g>
+  </svg>
+  <div><h1>База школы в одном окне</h1><p>Ученики, оплаты и просрочки, расписание, посещения, зарплаты учителей и финансы.</p></div>
+ </section>
+ <section class="auth-side"><div class="auth-card" id="authCard"></div></section>
+</div>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>Math.round(n||0).toLocaleString('ru-RU').replace(/^-/,'−')+' ₸';
+const fdate=s=>{if(!s)return '—';const[y,m,d]=String(s).split('-');return esc(d+'.'+m+'.'+y)};
+const DEF={schoolName:'TEMTUR',payDay:10,warnDays:3,payMethods:['Наличные','Карта','Перевод Kaspi'],expenseCats:['Аренда','Коммунальные услуги','Интернет','Реклама','Зарплаты','Канцелярия','Ремонт','Налоги']};
+const FMT={ind:'Индивидуально',group:'В группе'};
+const S={role:'none',canFin:false,canDel:false,users:[],authMode:'login',preview:false,db:null,cfg:{...DEF},subjects:[],teachers:[],students:[],charges:[],payments:[],expenses:[],acc:new Map(),fMonth:'',att:{},aDate:'',schT:'',chargeIds:new Set(),got:{},q:'',fSub:'',fTeach:'',fStat:'active',enrDraft:[],pMonth:''};
+const VIEWS=['panel','home','students','payments','schedule','attendance','salary','finance','teachers','subjects','nastroiki'];
+const pad=n=>String(n).padStart(2,'0');
+const todayS=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const ymOf=s=>(s||'').slice(0,7);
+const nextYm=p=>{let[y,m]=p.split('-').map(Number);m++;if(m>12){m=1;y++}return y+'-'+pad(m)};
+const dayDiff=(a,b)=>{const u=s=>{const[y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)};return Math.round((u(a)-u(b))/864e5)};
+const prevYm=p=>{let[y,m]=p.split('-').map(Number);m--;if(m<1){m=12;y--}return y+'-'+pad(m)};
+const WD=['','Пн','Вт','Ср','Чт','Пт','Сб','Вс'];const WDL=['','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
+const wdOf=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).getDay()||7};
+const MONTHS=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const fym=p=>{if(!p)return '—';const[y,m]=String(p).split('-');return esc((MONTHS[Number(m)-1]||'')+' '+y)};
+const isAdm=()=>S.role!=='owner'||S.preview;
+const noFin=()=>S.preview||!S.canFin;const noDel=()=>S.preview||!S.canDel;
+const allowed=v=>!(isAdm()&&(v==='home'||v==='nastroiki'))&&!(noFin()&&(v==='salary'||v==='finance'));
+const view=()=>{const h=location.hash.slice(1);return VIEWS.includes(h)&&allowed(h)?h:(isAdm()?'panel':'home')};
+
+const sub=id=>S.subjects.find(x=>x.id===id);
+const teach=id=>S.teachers.find(x=>x.id===id);
+const byName=(a,b)=>(a.fio||a.name||'').localeCompare(b.fio||b.name||'','ru');
+const active=()=>S.students.filter(s=>s.status!=='archive');
+const basePrice=e=>{const s=sub(e.subjectId);if(!s)return 0;return Number(e.format==='ind'?s.priceInd:s.priceGroup)||0};
+const price=e=>{const b=basePrice(e),v=Number(e.discVal)||0;const d=e.discType==='pct'?b*v/100:e.discType==='sum'?v:0;return Math.max(0,b-d)};
+const monthTotal=st=>(st.enr||[]).reduce((a,e)=>a+price(e),0);
+const firstMonth=st=>{if(!st.enrollDate)return null;const[y,m,d]=st.enrollDate.split('-').map(Number);const dim=new Date(y,m,0).getDate();const left=dim-d+1;const t=monthTotal(st);return{left,dim,total:t,sum:Math.round(t*left/dim)}};
+const rate=(t,f)=>Number(f==='ind'?t.rateInd:t.rateGroup)||0;
+const teacherRows=t=>{const rows=[];for(const st of active())for(const e of st.enr||[]){const s=sub(e.subjectId);if(s&&s.teacherId===t.id)rows.push({st,s,e,amt:rate(t,e.format)})}return rows.sort((a,b)=>byName(a.st,b.st))};
+/* начисления и баланс */
+const payDayOf=st=>Number(st.payDay)||Number(S.cfg.payDay)||10;
+function periodsFor(st){const enr=ymOf(st.enrollDate);if(!enr)return[];let p=st.billFrom&&st.billFrom>enr?st.billFrom:enr;
+ const end=st.status==='archive'?ymOf(st.archivedAt)||ymOf(todayS()):ymOf(todayS());const out=[];while(p<=end&&out.length<60){out.push(p);p=nextYm(p)}return out}
+function buildCharge(st,p){const first=p===ymOf(st.enrollDate);const fm=firstMonth(st);const[y,m]=p.split('-').map(Number);const dim=new Date(y,m,0).getDate();
+ return first?{studentId:st.id,period:p,kind:'first',amount:fm?fm.sum:0,due:st.expectedPayDate||st.enrollDate,detail:fm?`${fm.left} из ${fm.dim} дн.`:'',createdAt:new Date().toISOString()}
+  :{studentId:st.id,period:p,kind:'month',amount:monthTotal(st),due:p+'-'+pad(Math.min(payDayOf(st),dim)),detail:'',createdAt:new Date().toISOString()}}
+const chargesOf=id=>S.charges.filter(c=>c.studentId===id).sort((a,b)=>a.period.localeCompare(b.period));
+const paysOf=id=>S.payments.filter(p=>p.studentId===id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+function acct(st){if(S.acc.has(st.id))return S.acc.get(st.id);const r=acct0(st);S.acc.set(st.id,r);return r}
+function acct0(st){const ch=chargesOf(st.id);const paid=paysOf(st.id).reduce((a,p)=>a+(Number(p.amount)||0),0);const due=ch.reduce((a,c)=>a+effAmt(st,c),0);
+ let rest=paid,open=null;const covered={};for(const c of ch){const a=effAmt(st,c);if(rest>=a){rest-=a;covered[c.id]=a;continue}covered[c.id]=rest;if(!open)open={c,left:a-rest};rest=0}
+ const bal=paid-due;const t=todayS();let st8='ok',days=0;
+ if(open&&bal<0){const d=dayDiff(t,open.c.due);if(d>0){st8='late';days=d}else if(-d<=Number(S.cfg.warnDays||0)){st8='soon';days=-d}else{st8='wait';days=-d}}
+ return{paid,due,bal,open,st:st8,days,covered,ch}}
+function pill(a){if(a.st==='late')return `<span class="pill late">просрочка ${a.days} дн. · ${money(-a.bal)}</span>`;
+ if(a.st==='soon')return `<span class="pill soon">${a.days?'оплатить через '+a.days+' дн.':'оплатить сегодня'} · ${money(-a.bal)}</span>`;
+ if(a.st==='wait')return `<span class="pill wait">до ${fdate(a.open.c.due)} · ${money(-a.bal)}</span>`;
+ return `<span class="pill ok">${a.bal>0?'переплата '+money(a.bal):'оплачено'}</span>`}
+/* расписание, посещения, перерасчёт */
+const slotTxt=e=>(e.slots||[]).filter(x=>x.d).map(x=>WD[x.d]+' '+(x.t||'')).join(', ');
+function lessonsInMonth(e,p){const[y,m]=p.split('-').map(Number);const dim=new Date(y,m,0).getDate();let n=0;for(let d=1;d<=dim;d++){const w=new Date(y,m-1,d).getDay()||7;n+=(e.slots||[]).filter(x=>Number(x.d)===w).length}return n}
+const attKey=(sid,subj,t)=>sid+'|'+subj+'|'+(t||'');
+const markOf=(date,sid,subj,t)=>((S.att[date]||{}).marks||{})[attKey(sid,subj,t)]||'';
+function attMonth(sid,p){const out=[];for(const[date,doc]of Object.entries(S.att)){if(ymOf(date)!==p)continue;for(const[k,v]of Object.entries(doc.marks||{})){if(!v)continue;const[s,subj,t]=k.split('|');if(s===sid)out.push({date,subj,t,mark:v})}}return out.sort((a,b)=>(a.date+a.t).localeCompare(b.date+b.t))}
+function creditFor(st,p){let c=0,n=0;const marks=attMonth(st.id,p).filter(x=>x.mark==='sick');if(!marks.length)return{sum:0,n:0};
+ for(const e of st.enr||[]){const k=marks.filter(x=>x.subj===e.subjectId).length;if(!k)continue;const L=lessonsInMonth(e,p);if(!L)continue;c+=price(e)/L*k;n+=k}return{sum:Math.round(c),n}}
+const effAmt=(st,c)=>Math.max(0,(Number(c.amount)||0)-creditFor(st,prevYm(c.period)).sum);
+function allLessons(){const out=[];for(const st of active())for(const e of st.enr||[])for(const x of e.slots||[]){if(!x.d)continue;const s=sub(e.subjectId);if(!s)continue;out.push({st,e,s,d:Number(x.d),t:x.t||''})}return out}
+function groupLessons(list){const g={};for(const l of list){const k=l.e.format==='group'?l.d+'|'+l.t+'|'+l.s.id+'|g':l.d+'|'+l.t+'|'+l.s.id+'|'+l.st.id;(g[k]=g[k]||{d:l.d,t:l.t,s:l.s,format:l.e.format,items:[]}).items.push(l)}
+ return Object.values(g).sort((a,b)=>a.d-b.d||a.t.localeCompare(b.t)||a.s.name.localeCompare(b.s.name,'ru'))}
+const MARKS={present:'Был',sick:'Болел',absent:'Прогул'};
+/* зарплаты: ставка × доля оплаченного начисления за месяц (первый месяц — пропорционально дням) */
+function salaryRows(t,p){const rows=[];for(const st of S.students){const c=S.charges.find(x=>x.id===st.id+'_'+p);if(!c)continue;const a=acct(st);const eff=effAmt(st,c);
+ const ratio=eff>0?Math.min(1,(a.covered[c.id]||0)/eff):1;let f=1;if(c.kind==='first'){const fm=firstMonth(st);if(fm)f=fm.left/fm.dim}
+ for(const e of st.enr||[]){const s=sub(e.subjectId);if(!s||s.teacherId!==t.id)continue;const base=Math.round(rate(t,e.format)*f);rows.push({st,s,e,base,ratio,amt:Math.round(base*ratio)})}}
+ return rows.sort((a,b)=>byName(a.st,b.st))}
+const salPaid=(tid,p)=>S.expenses.filter(x=>x.teacherId===tid&&x.period===p).reduce((a,x)=>a+(Number(x.amount)||0),0);
+const expOfMonth=p=>S.expenses.filter(x=>ymOf(x.date)===p);
+const incOfMonth=p=>S.payments.filter(x=>ymOf(x.date)===p).reduce((a,x)=>a+(Number(x.amount)||0),0);
+const discTxt=e=>e.discType==='pct'&&e.discVal?e.discVal+'%':e.discType==='sum'&&e.discVal?money(e.discVal):'—';
+
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2800)}
+function openDlg(title,html,center){S.openSt=null;$('#dlgT').textContent=title;$('#dlgB').innerHTML=html;const o=$('#ov');o.classList.toggle('center',!!center);o.classList.add('open');document.body.style.overflow='hidden';o.querySelector('.dlg').scrollTop=0;const f=$('#dlgB form input:not([type=hidden]),#dlgB form select');(f&&matchMedia('(min-width:901px)').matches?f:o.querySelector('.dlg')).focus({preventScroll:true})}
+function closeDlg(){$('#ov').classList.remove('open','center');$('#dlgB').innerHTML='';document.body.style.overflow='';S.onSubmit=null;S.onConfirm=null;S.openSt=null}
+function confirmDlg(text,fn){openDlg('Подтвердите',`<p style="margin:0">${esc(text)}</p><div class="acts"><button data-act="close">Отмена</button><button class="pri" data-act="yes">Да</button></div>`,true);S.onConfirm=fn}
+
+async function save(path,data){if(!S.db){toast('Нет связи с базой');return false}try{await saveX(path,data);await refresh();return true}catch(e){toast(errText(e));return false}}
+async function del(path){try{await delX(path);await refresh();return true}catch(e){toast(errText(e));return false}}
+const newId=()=>crypto.randomUUID?crypto.randomUUID():'10000000-1000-4000-8000-100000000000'.replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+const errText=e=>e&&e.code===403||e&&e.code===401||/row-level|permission/i.test(e&&e.message||'')?'Нет прав на это действие':e&&e.code==='net'?'Нет связи с сервером':'Ошибка: '+(e&&e.message||e);
+
+function field(f,d){const v=d[f.k]??f.def??'';const lab=`<span class="${f.req?'req':''}">${esc(f.l)}</span>`;
+ if(f.t==='select')return `<label>${lab}<select name="${f.k}">${f.o.map(([a,b])=>`<option value="${esc(a)}"${String(v)===String(a)?' selected':''}>${esc(b)}</option>`).join('')}</select></label>`;
+ if(f.t==='area')return `<label style="grid-column:1/-1">${lab}<textarea name="${f.k}">${esc(v)}</textarea></label>`;
+ return `<label${f.fin?' class="fin"':''}>${lab}<input name="${f.k}" type="${f.t||'text'}" value="${esc(v)}"${f.req?' required':''}${f.t==='number'?' min="0" step="any" inputmode="decimal"':''}></label>`}
+const readForm=(fields,fd)=>{const o={};for(const f of fields){let v=(fd.get(f.k)??'').toString().trim();if(f.t==='number')v=v===''?'':Number(v);o[f.k]=v}return o};
+
+const F_ST=[{k:'fio',l:'ФИО ученика',req:1},{k:'birth',l:'Дата рождения',t:'date'},{k:'iin',l:'ИИН'},{k:'school',l:'Школа и класс'},{k:'phone',l:'Телефон ученика',t:'tel'},{k:'parentFio',l:'ФИО родителя'},{k:'parentPhone',l:'Телефон родителя',t:'tel'},{k:'address',l:'Адрес'},{k:'enrollDate',l:'Дата записи',t:'date',req:1},{k:'expectedPayDate',l:'Ожидаемая дата первой оплаты',t:'date'},{k:'payDay',l:'Свой день оплаты (пусто = общий)',t:'number'},{k:'billFrom',l:'Начислять с месяца (для старых учеников)',t:'month'},{k:'notes',l:'Заметки',t:'area'}];
+const F_T=[{k:'fio',l:'ФИО учителя',req:1},{k:'phone',l:'Телефон',t:'tel'},{k:'iin',l:'ИИН'},{k:'birth',l:'Дата рождения',t:'date'},{k:'card',l:'Карта или счёт'},{k:'startDate',l:'Дата начала работы',t:'date'},{k:'rateInd',l:'Сумма за индивидуального ученика, ₸/мес',t:'number',fin:1},{k:'rateGroup',l:'Сумма за ученика в группе, ₸/мес',t:'number',fin:1},{k:'notes',l:'Заметки',t:'area'}];
+const F_S=()=>[{k:'name',l:'Название предмета',req:1},{k:'teacherId',l:'Учитель',t:'select',o:[['','— не выбран —'],...[...S.teachers].sort(byName).map(t=>[t.id,t.fio])]},{k:'priceInd',l:'Цена индивидуально, ₸/мес',t:'number'},{k:'priceGroup',l:'Цена в группе, ₸/мес',t:'number'}];
+
+/* ---------- оформление: общие кусочки ---------- */
+const ic=n=>`<svg class="i" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const initials=n=>{const p=String(n||'?').trim().split(/[\s@._-]+/).filter(Boolean);return esc((((p[0]||'?')[0]||'?')+((p[1]||'')[0]||'')).toUpperCase())};
+const hue=n=>{let h=0;for(const ch of String(n||''))h=(h*31+ch.charCodeAt(0))>>>0;return h%6};
+const av=n=>`<span class="av c${hue(n)}" aria-hidden="true">${initials(n)}</span>`;
+const whoC=(n,s)=>`<div class="who">${av(n)}<div><b>${esc(n)}</b>${s?`<span>${s}</span>`:''}</div></div>`;
+const ph=(t,s,tools)=>`<div class="ph"><div><h1>${t}</h1>${s?`<p>${s}</p>`:''}</div>${tools?`<div class="tools">${tools}</div>`:''}</div>`;
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const longDate=()=>cap(new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+const kpi=(v,l,cls)=>`<div class="kpi${cls?' '+cls:''}"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+const panel=(title,body,meta,cls)=>`<div class="panel${cls?' '+cls:''}"><div class="panel-h"><h2>${title}</h2>${meta!=null&&meta!==''?`<span class="meta">${meta}</span>`:''}</div>${body}</div>`;
+const emptyB=(t,s)=>`<div class="empty"><b>${t}</b>${s||''}</div>`;
+const fmtK=n=>{const a=Math.abs(n),s=n<0?'−':'';if(a>=1e6)return s+(a/1e6).toLocaleString('ru-RU',{maximumFractionDigits:1})+' млн';if(a>=1e3)return s+Math.round(a/1e3).toLocaleString('ru-RU')+' тыс.';return s+Math.round(a)};
+const niceMax=v=>{if(v<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(v)));for(const m of[1,2,2.5,5,10])if(m*e>=v)return m*e;return 10*e};
+const ago=t=>{if(!t)return '';const d=Math.round((Date.now()-new Date(t).getTime())/864e5);return d<=0?'сегодня':d===1?'вчера':d<30?d+' дн. назад':new Date(t).toLocaleDateString('ru-RU')};
+const monthInput=()=>{if(!S.fMonth)S.fMonth=ymOf(todayS());return `<input type="month" id="fMonth" value="${esc(S.fMonth)}" aria-label="Месяц" style="width:auto">`};
+
+/* график «доход и расходы» за 6 месяцев, заканчивая месяцем p */
+function chart6(endP){const ps=[];let p=endP;for(let i=0;i<6;i++){ps.unshift(p);p=prevYm(p)}
+ const d=ps.map(p=>({p,inc:incOfMonth(p),ex:expOfMonth(p).reduce((a,x)=>a+(Number(x.amount)||0),0)}));
+ const top=niceMax(Math.max(1,...d.map(x=>Math.max(x.inc,x.ex))));const short=p=>cap((MONTHS[Number(p.slice(5))-1]||'').slice(0,3));
+ const h=v=>Math.max(v>0?1.5:0,v/top*100).toFixed(1);
+ return `<div class="chart"><div class="legend"><span><i style="background:var(--s1)"></i>Доход: получено оплат</span><span><i style="background:var(--s2)"></i>Расходы</span></div>
+ <div class="plot" style="--n:6">${[.5,1].map(f=>`<div class="gl" style="bottom:${f*100}%"><span>${fmtK(top*f)}</span></div>`).join('')}${d.map(x=>`<div class="cg" tabindex="0" aria-label="${fym(x.p)}: доход ${money(x.inc)}, расходы ${money(x.ex)}"><div class="b b1" style="height:${h(x.inc)}%"></div><div class="b b2" style="height:${h(x.ex)}%"></div><div class="tt"><b>${fym(x.p)}</b><br>Доход: ${money(x.inc)}<br>Расходы: ${money(x.ex)}<br>Прибыль: ${money(x.inc-x.ex)}</div></div>`).join('')}</div>
+ <div class="xl" style="--n:6">${d.map(x=>`<div>${short(x.p)}<b class="${x.inc-x.ex<0?'red':''}">${x.inc||x.ex?fmtK(x.inc-x.ex):'—'}</b></div>`).join('')}</div>
+ <p class="sample">Под месяцами — прибыль. Наведите на столбцы, чтобы увидеть точные суммы.</p></div>`}
+
+/* занятия дня — таймлайн с крупным временем */
+function timeline(L,date){const G=groupLessons(L);if(!G.length)return emptyB('Сегодня занятий нет','По расписанию учеников на этот день ничего не стоит.');
+ return `<ul class="tl">${G.map(g=>`<li><div class="time">${esc(g.t||'—')}</div><div><div class="ttl">${esc(g.s.name)} <span class="tag${g.format==='group'?' g':''}">${g.format==='group'?'группа':'индивидуально'}</span></div><div class="sub">${esc(teach(g.s.teacherId)?.fio||'без учителя')}</div><div class="chips">${g.items.map(l=>{const m=markOf(date,l.st.id,l.s.id,l.t);return `<span class="chip ${m}">${esc(l.st.fio)}${m?': '+MARKS[m].toLowerCase():''}</span>`}).join('')}</div></div></li>`).join('')}</ul>`}
+
+/* таблица учеников с долгом/скорой оплатой */
+function dueTable(list,withPay){return `<div class="scroll"><table class="stack"><thead><tr><th>Ученик</th><th>Оплата</th>${withPay?'<th></th>':''}</tr></thead><tbody>${list.map(x=>`<tr class="${withPay?'':'click '}${x.a.st==='late'?'late':''}"${withPay?'':` data-act="st-open" data-id="${esc(x.s.id)}"`}><td class="nolab">${withPay?`<button class="link" style="padding:0;color:inherit;text-align:start;white-space:normal" data-act="st-open" data-id="${esc(x.s.id)}">${whoC(x.s.fio,esc(x.s.parentPhone||'телефон не указан'))}</button>`:whoC(x.s.fio,esc(x.s.parentPhone||'телефон не указан'))}</td><td class="nolab">${pill(x.a)}</td>${withPay?`<td class="num nolab"><button class="sm" data-act="pay-new" data-id="${esc(x.s.id)}" aria-label="Принять оплату от ${esc(x.s.fio)}">${ic('pay')}Принять</button></td>`:''}</tr>`).join('')}</tbody></table></div>`}
+const dueLists=()=>{const rows=active().map(s=>({s,a:acct(s)}));return{rows,late:rows.filter(x=>x.a.st==='late').sort((a,b)=>b.a.days-a.a.days),soon:rows.filter(x=>x.a.st==='soon').sort((a,b)=>a.a.days-b.a.days)}};
+
+/* ---------- экраны ---------- */
+function vPanel(){const date=todayS();const w=wdOf(date);
+ const L=allLessons().filter(l=>l.d===w&&(!l.st.enrollDate||l.st.enrollDate<=date));const nm=L.filter(l=>!markOf(date,l.st.id,l.s.id,l.t)).length;
+ const{late,soon}=dueLists();const todayPays=S.payments.filter(p=>p.date===date);const tp=todayPays.reduce((a,p)=>a+(Number(p.amount)||0),0);
+ const yest=(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())})();
+ const yN=allLessons().filter(l=>l.d===wdOf(yest)&&(!l.st.enrollDate||l.st.enrollDate<=yest)).filter(l=>!markOf(yest,l.st.id,l.s.id,l.t)).length;
+ return ph('Панель администратора',longDate())+
+ `<div class="quick"><button class="pri" data-act="pay-new">${ic('pay')}Принять оплату</button><button data-act="st-new">${ic('plus')}Добавить ученика</button><button data-act="go-att">${ic('att')}Отметить посещения</button><button data-act="exp-new">${ic('coins')}Внести расход</button></div>
+ <div class="kpis">${kpi(L.length,'занятий сегодня'+(nm?', не отмечено '+nm:''))}${kpi(late.length,'учеников с просрочкой',late.length?'alert':'')}${kpi(soon.length,'оплата в ближайшие '+esc(S.cfg.warnDays)+' дн.')}${kpi(money(tp),'принято сегодня, оплат: '+todayPays.length)}</div>
+ ${yN?`<div class="note">Вчера, ${fdate(yest)}, не отмечено посещений: ${yN}. <button class="link" data-act="go-att" data-date="${yest}">Отметить</button></div>`:''}
+ <div class="grid">${panel('Занятия сегодня',timeline(L,date),WDL[w])}
+ <div class="stack-gap">${panel('Просрочка: позвонить родителям',late.length?dueTable(late,true):emptyB('Просрочек нет','Все ученики оплатили вовремя.'),late.length||'')}${panel('Скоро оплата',soon.length?dueTable(soon,true):emptyB('В ближайшие дни оплат нет',''),soon.length||'')}</div></div>`}
+
+function vHome(){const a=active();const ym=ymOf(todayS());
+ const income=a.reduce((x,s)=>x+monthTotal(s),0);const fot=S.teachers.reduce((x,t)=>x+teacherRows(t).reduce((y,r)=>y+r.amt,0),0);
+ const fresh=a.filter(s=>(s.enrollDate||'').startsWith(ym)).length;const{rows,late,soon}=dueLists();const debt=rows.reduce((x,r)=>x+Math.max(0,-r.a.bal),0);
+ const paidM=incOfMonth(ym),exM=expOfMonth(ym).reduce((x,e)=>x+(Number(e.amount)||0),0);
+ const start=S.subjects.length?'':panel('С чего начать',`<div class="panel-b"><ol style="margin:0;padding-left:20px;line-height:2">
+  <li><a href="#teachers">Добавьте учителей</a> и их ставки за ученика.</li><li><a href="#subjects">Добавьте предметы</a> с ценами за месяц.</li><li><a href="#students">Добавьте учеников</a>, их предметы и дни занятий.</li></ol></div>`,'','')+'<div style="height:16px"></div>';
+ return ph('Главная',longDate(),`<button data-act="st-new">${ic('plus')}Ученик</button><button class="pri" data-act="pay-new">${ic('pay')}Принять оплату</button>`)+
+ `<div class="kpis">${kpi(a.length,'активных учеников, новых за месяц: '+fresh)}${kpi(money(debt),'общий долг учеников',debt?'alert':'')}${kpi(late.length,'с просрочкой',late.length?'alert':'')}${kpi(money(paidM),'получено за '+fym(ym),'fin')}${kpi(money(paidM-exM),'прибыль за '+fym(ym),'fin'+(paidM-exM<0?' alert':''))}</div>
+ ${start}
+ <div class="grid">${panel('Доход и расходы',chart6(ym),'последние 6 месяцев','fin')}
+ <div class="stack-gap">${panel('Просрочка',late.length?dueTable(late):emptyB('Просрочек нет',''),late.length||'')}${panel('Скоро оплата',soon.length?dueTable(soon):emptyB('В ближайшие дни оплат нет',''),esc(S.cfg.warnDays)+' дн.')}</div></div>
+ <div class="kpis fin" style="margin-top:16px">${kpi(money(income),'доход в месяц, если все оплатят')}${kpi(money(fot),'зарплаты учителей в месяц')}${kpi(S.teachers.length,'учителей')}${kpi(S.subjects.length,'предметов')}</div>`}
+
+function vPayments(){if(!S.pMonth)S.pMonth=ymOf(todayS());const list=S.payments.filter(p=>ymOf(p.date)===S.pMonth).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+ const total=list.reduce((a,p)=>a+(Number(p.amount)||0),0);const by={};for(const p of list)by[p.method||'Без способа']=(by[p.method||'Без способа']||0)+(Number(p.amount)||0);
+ const stu=id=>S.students.find(s=>s.id===id);
+ return ph('Оплаты','Все принятые оплаты за '+fym(S.pMonth),`<input type="month" id="pMonth" value="${esc(S.pMonth)}" aria-label="Месяц" style="width:auto"><button class="pri" data-act="pay-new">${ic('plus')}Принять оплату</button>`)+
+ `<div class="kpis">${kpi(money(total),'всего, оплат: '+list.length)}${Object.entries(by).map(([k,v])=>kpi(money(v),esc(k))).join('')}</div>
+ <div class="panel">${list.length?`<div class="scroll"><table class="stack"><thead><tr><th>Дата</th><th>Ученик</th><th class="num">Сумма</th><th>Способ</th><th>За месяц</th><th>Заметка</th><th></th></tr></thead><tbody>${list.map(p=>`<tr><td class="nw">${fdate(p.date)}</td><td><button class="link" style="padding:0;color:inherit;text-align:start" data-act="st-open" data-id="${esc(p.studentId)}">${whoC(stu(p.studentId)?.fio||'Ученик удалён','')}</button></td><td class="num"><b>${money(p.amount)}</b></td><td>${esc(p.method||'—')}</td><td class="nw">${fym(p.period)}</td><td>${esc(p.note||'')}</td><td class="num nolab"><button class="link danger" data-act="pay-del" data-id="${esc(p.id)}">Удалить</button></td></tr>`).join('')}</tbody></table></div>`:emptyB('Оплат за этот месяц нет','Нажмите «Принять оплату», когда ученик заплатит.')}</div>`}
+
+function vSchedule(){let L=allLessons();if(S.schT)L=L.filter(l=>l.s.teacherId===S.schT);const G=groupLessons(L);
+ const opt=`<option value="">Все учителя</option>`+[...S.teachers].sort(byName).map(t=>`<option value="${esc(t.id)}"${S.schT===t.id?' selected':''}>${esc(t.fio)}</option>`).join('');
+ const days=G.some(g=>g.d===7)?[1,2,3,4,5,6,7]:[1,2,3,4,5,6];const today=wdOf(todayS());
+ return ph('Расписание','Неделя по дням. Группы показаны одной карточкой, индивидуальные занятия — отдельно.',`<select id="schT" aria-label="Учитель">${opt}</select>`)+
+ (G.length?`<div class="week" style="--days:${days.length}">${days.map(d=>{const gs=G.filter(g=>g.d===d);return `<section class="day${d===today?' today':''}"><div class="day-h">${WDL[d]}<span>${gs.length?gs.length+' зан.':''}</span></div><div class="day-b">${gs.length?gs.map(g=>`<div class="lesson${g.format==='ind'?' ind':''}"><div><span class="t">${esc(g.t||'—')}</span> <span class="s">${esc(g.s.name)}</span></div><div class="muted sm">${esc(teach(g.s.teacherId)?.fio||'без учителя')}, ${g.format==='group'?'группа':'индивидуально'}</div><div class="who-list">${g.items.map(l=>`<button class="link" data-act="st-open" data-id="${esc(l.st.id)}">${esc(l.st.fio)}</button>`).join('')}</div></div>`).join(''):'<span class="muted sm" style="padding:4px">Нет занятий</span>'}</div></section>`}).join('')}</div>`:`<div class="panel">${emptyB('Расписания пока нет','Откройте ученика, нажмите «Изменить» и добавьте к предмету дни и время занятий.')}</div>`)}
+
+function vAttendance(){if(!S.aDate)S.aDate=todayS();const date=S.aDate;const w=wdOf(date);
+ const L=allLessons().filter(l=>l.d===w&&(!l.st.enrollDate||l.st.enrollDate<=date));const G=groupLessons(L);
+ const cnt={present:0,sick:0,absent:0,none:0};for(const l of L){const m=markOf(date,l.st.id,l.s.id,l.t);cnt[m||'none']++}
+ return ph('Посещения',WDL[w]+', '+fdate(date),`<input type="date" id="aDate" value="${esc(date)}" aria-label="Дата" style="width:auto">`)+
+ `<div class="kpis">${kpi(L.length,'занятий у учеников')}${kpi(cnt.present,'был','good')}${kpi(cnt.sick,'болел')}${kpi(cnt.absent,'прогул',cnt.absent?'alert':'')}${kpi(cnt.none,'без отметки')}</div>
+ ${G.length?G.map(g=>panel(esc(g.t||'—')+', '+esc(g.s.name),`<div class="scroll"><table class="stack"><thead><tr><th>Ученик</th><th>Отметка</th></tr></thead><tbody>${g.items.map(l=>{const k=attKey(l.st.id,l.s.id,l.t);const m=markOf(date,l.st.id,l.s.id,l.t);return `<tr><td class="nolab">${whoC(l.st.fio,'')}</td><td class="nolab"><div class="seg" role="group" aria-label="Отметка для ${esc(l.st.fio)}">${Object.entries(MARKS).map(([mk,ml])=>`<button data-act="att" data-date="${esc(date)}" data-k="${esc(k)}" data-m="${mk}" aria-pressed="${m===mk}">${ml}</button>`).join('')}</div></td></tr>`}).join('')}</tbody></table></div>`,esc(teach(g.s.teacherId)?.fio||'')+', '+(g.format==='group'?'группа':'индивидуально'))).join(''):`<div class="panel">${emptyB('В этот день занятий по расписанию нет.','Выберите другую дату или добавьте ученикам дни занятий.')}</div>`}
+ <p class="sample">«Болел» уменьшает оплату следующего месяца на стоимость пропущенных занятий. «Прогул» оплату не меняет. Повторное нажатие снимает отметку.</p>`}
+
+function vSalary(){monthInput();const p=S.fMonth;const T=[...S.teachers].sort(byName).map(t=>{const r=salaryRows(t,p);const calc=r.reduce((a,x)=>a+x.amt,0);const full=r.reduce((a,x)=>a+x.base,0);const paid=salPaid(t.id,p);return{t,r,calc,full,paid,left:calc-paid}});
+ const sum=k=>T.reduce((a,x)=>a+x[k],0);
+ return ph('Зарплаты учителей','За '+fym(p)+'. Учитель получает ставку за ученика в той доле, в какой ученик оплатил месяц.',monthInput())+
+ `<div class="kpis">${kpi(money(sum('calc')),'начислено по оплатам')}${kpi(money(sum('paid')),'выплачено')}${kpi(money(sum('left')),'осталось выплатить',sum('left')>0?'alert':'')}${kpi(money(sum('full')),'если все ученики оплатят')}</div>
+ ${T.length?T.map(x=>`<div class="panel"><div class="panel-h">${whoC(x.t.fio,`к выплате ${money(x.calc)} из ${money(x.full)}, выплачено ${money(x.paid)}`)}<span style="flex:1"></span>${x.left>0?`<button class="pri" data-act="sal-pay" data-id="${esc(x.t.id)}">Выплатить ${money(x.left)}</button>`:x.calc>0?'<span class="pill ok">выплачено</span>':''}</div>
+ ${x.r.length?`<div class="scroll"><table class="stack"><thead><tr><th>Ученик</th><th>Предмет</th><th>Формат</th><th class="num">Ставка</th><th class="num">Оплачено учеником</th><th class="num">Учителю</th></tr></thead><tbody>${x.r.map(r=>`<tr><td>${esc(r.st.fio)}</td><td>${esc(r.s.name)}</td><td>${FMT[r.e.format]}</td><td class="num">${money(r.base)}</td><td class="num${r.ratio<1?' red':''}">${Math.round(r.ratio*100)}%</td><td class="num"><b>${money(r.amt)}</b></td></tr>`).join('')}</tbody></table></div>`:emptyB('В этом месяце учеников нет','')}</div>`).join(''):`<div class="panel">${emptyB('Учителей пока нет','Добавьте их в разделе «Учителя».')}</div>`}
+ <p class="sample">За первый неполный месяц ставка уменьшается пропорционально дням. Выплата сразу попадает в расходы по статье «Зарплаты».</p>`}
+
+function vFinance(){monthInput();const p=S.fMonth;const inc=incOfMonth(p);const ex=expOfMonth(p).sort((a,b)=>(b.date||'').localeCompare(a.date||''));const exS=ex.reduce((a,x)=>a+(Number(x.amount)||0),0);const prof=inc-exS;
+ const charged=S.charges.filter(c=>c.period===p).reduce((a,c)=>{const st=S.students.find(s=>s.id===c.studentId);return a+(st?effAmt(st,c):0)},0);
+ const by={};for(const x of ex)by[x.cat||'Без статьи']=(by[x.cat||'Без статьи']||0)+(Number(x.amount)||0);const cats=Object.entries(by).sort((a,b)=>b[1]-a[1]);const mx=Math.max(1,...cats.map(c=>c[1]));
+ return ph('Финансы',fym(p),monthInput()+`<button class="pri" data-act="exp-new">${ic('plus')}Добавить расход</button>`)+
+ `<div class="kpis">${kpi(money(inc),'доход: получено оплат')}${kpi(money(exS),'расходы')}${kpi(money(prof),'прибыль за '+fym(p),prof<0?'alert':'good')}${kpi(money(charged),'начислено ученикам за месяц')}</div>
+ <div class="grid">${panel('Доход и расходы',chart6(p),'6 месяцев')}
+ ${panel('Расходы по статьям',`<div class="panel-b">${cats.length?cats.map(([k,v])=>`<div class="hbar"><div class="row"><span>${esc(k)}</span><b class="nw">${money(v)}</b></div><div class="track"><div class="fill" style="width:${(v/mx*100).toFixed(1)}%"></div></div></div>`).join(''):'<p class="muted" style="margin:0">Расходов за этот месяц нет.</p>'}</div>`,cats.length?money(exS):'')}</div>
+ <div style="height:16px"></div>
+ ${panel('Все расходы за месяц',ex.length?`<div class="scroll"><table class="stack"><thead><tr><th>Дата</th><th>Статья</th><th class="num">Сумма</th><th>Комментарий</th><th></th></tr></thead><tbody>${ex.map(x=>`<tr><td class="nw">${fdate(x.date)}</td><td>${esc(x.cat||'—')}${x.teacherId?'<br><span class="muted sm">'+esc(teach(x.teacherId)?.fio||'учитель удалён')+', за '+fym(x.period)+'</span>':''}</td><td class="num"><b>${money(x.amount)}</b></td><td>${esc(x.note||'')}${x.method?' <span class="tag g">'+esc(x.method)+'</span>':''}</td><td class="num nolab"><button class="link danger" data-act="exp-del" data-id="${esc(x.id)}">Удалить</button></td></tr>`).join('')}</tbody></table></div>`:emptyB('Расходов за этот месяц нет','Нажмите «Добавить расход».'),ex.length||'')}`}
+
+function vStudents(){const q=S.q.toLowerCase();
+ let list=S.students.filter(s=>S.fStat==='archive'?s.status==='archive':s.status!=='archive');
+ if(q)list=list.filter(s=>[s.fio,s.parentFio,s.parentPhone,s.phone,s.iin].some(v=>(v||'').toLowerCase().includes(q)));
+ if(S.fSub)list=list.filter(s=>(s.enr||[]).some(e=>e.subjectId===S.fSub));
+ if(S.fTeach)list=list.filter(s=>(s.enr||[]).some(e=>sub(e.subjectId)?.teacherId===S.fTeach));
+ const A={};for(const s of list)A[s.id]=acct(s);
+ if(S.fStat==='debt')list=list.filter(s=>A[s.id].st==='late'||A[s.id].st==='soon');
+ list.sort(byName);const nArch=S.students.filter(s=>s.status==='archive').length;
+ const opt=(arr,sel,lab)=>`<option value="">${lab}</option>`+arr.map(x=>`<option value="${esc(x.id)}"${sel===x.id?' selected':''}>${esc(x.name||x.fio)}</option>`).join('');
+ return ph('Ученики',active().length+' активных'+(nArch?', в архиве '+nArch:''),`<button class="pri" data-act="st-new">${ic('plus')}Добавить ученика</button>`)+
+ `<div class="bar"><label class="search grow"><span class="sr">Поиск</span>${ic('search')}<input id="q" placeholder="ФИО, родитель, телефон или ИИН" value="${esc(S.q)}" autocomplete="off"></label>
+ <select id="fSub" aria-label="Предмет">${opt([...S.subjects].sort(byName),S.fSub,'Все предметы')}</select>
+ <select id="fTeach" aria-label="Учитель">${opt([...S.teachers].sort(byName),S.fTeach,'Все учителя')}</select>
+ <select id="fStat" aria-label="Статус"><option value="active"${S.fStat==='active'?' selected':''}>Активные</option><option value="debt"${S.fStat==='debt'?' selected':''}>Должники и скоро оплата</option><option value="archive"${S.fStat==='archive'?' selected':''}>Архив</option></select></div>
+ <div class="panel">${list.length?`<div class="scroll"><table class="stack"><thead><tr><th>Ученик</th><th>Предметы</th><th class="num">В месяц</th><th>Оплата</th><th>Записан</th></tr></thead><tbody>${list.map(s=>`<tr class="click${A[s.id].st==='late'?' late':''}" data-act="st-open" data-id="${esc(s.id)}"><td>${whoC(s.fio,esc(s.parentPhone?'родитель: '+s.parentPhone:(s.school||'')))}</td><td>${(s.enr||[]).map(e=>`<span class="tag${e.format==='group'?' g':''}">${esc(sub(e.subjectId)?.name||'?')}</span>`).join('')||'<span class="muted">—</span>'}</td><td class="num">${money(monthTotal(s))}</td><td>${pill(A[s.id])}</td><td class="nw">${fdate(s.enrollDate)}</td></tr>`).join('')}</tbody></table></div>`:S.students.length?emptyB('Никого не найдено','Измените поиск или фильтры.'):emptyB('Учеников пока нет','Нажмите «Добавить ученика».')}</div>
+ <p class="sample">Найдено: ${list.length}</p>`}
+
+function vTeachers(){const list=[...S.teachers].sort(byName);
+ return ph('Учителя',list.length+' в школе',`<button class="pri" data-act="t-new">${ic('plus')}Добавить учителя</button>`)+
+ `<div class="panel">${list.length?`<div class="scroll"><table class="stack"><thead><tr><th>Учитель</th><th>Предметы</th><th class="num">Учеников</th><th class="num fin">Зарплата в месяц</th></tr></thead><tbody>${list.map(t=>{const r=teacherRows(t);return `<tr class="click" data-act="t-open" data-id="${esc(t.id)}"><td>${whoC(t.fio,esc(t.phone||''))}</td><td>${S.subjects.filter(s=>s.teacherId===t.id).map(s=>`<span class="tag">${esc(s.name)}</span>`).join('')||'<span class="muted">—</span>'}</td><td class="num">${new Set(r.map(x=>x.st.id)).size}</td><td class="num fin">${money(r.reduce((a,x)=>a+x.amt,0))}</td></tr>`}).join('')}</tbody></table></div>`:emptyB('Учителей пока нет','Нажмите «Добавить учителя».')}</div>
+ <p class="sample fin">Здесь зарплата при полной оплате всеми учениками. Расчёт по реальным оплатам — в разделе «Зарплаты».</p>`}
+
+function vSubjects(){const list=[...S.subjects].sort(byName);
+ return ph('Предметы',list.length+' в школе',`<button class="pri" data-act="s-new">${ic('plus')}Добавить предмет</button>`)+
+ `<div class="panel">${list.length?`<div class="scroll"><table class="stack"><thead><tr><th>Предмет</th><th>Учитель</th><th class="num">Индивидуально</th><th class="num">В группе</th><th class="num">Учеников</th><th></th></tr></thead><tbody>${list.map(s=>`<tr><td><b>${esc(s.name)}</b></td><td>${esc(teach(s.teacherId)?.fio||'—')}</td><td class="num">${money(s.priceInd)}</td><td class="num">${money(s.priceGroup)}</td><td class="num">${active().filter(st=>(st.enr||[]).some(e=>e.subjectId===s.id)).length}</td><td class="num nolab"><button class="link" data-act="s-edit" data-id="${esc(s.id)}">Изменить</button><button class="link danger" data-act="s-del" data-id="${esc(s.id)}">Удалить</button></td></tr>`).join('')}</tbody></table></div>`:emptyB('Предметов пока нет','Нажмите «Добавить предмет» и укажите цены за месяц.')}</div>`}
+
+const plural=(n,a,b,c)=>{n=Math.abs(n)%100;const m=n%10;return n>10&&n<20?c:m===1?a:m>=2&&m<=4?b:c};
+const LOGIN_DOMAIN='@temtur.invalid';
+const loginOf=e=>{e=String(e||'');return e.toLowerCase().endsWith(LOGIN_DOMAIN)?e.slice(0,-LOGIN_DOMAIN.length):e};
+const userName=u=>u.full_name||u.username||loginOf(u.email);
+function usersHTML(){const own=S.users.filter(u=>u.role==='owner'),staff=S.users.filter(u=>u.role!=='owner');
+ const sw=(u,k,label)=>{const on=!!u[k],dis=u.role!=='admin';return `<label class="switch${dis?' dim':''}"><input type="checkbox" data-perm-user="${esc(u.id)}" data-perm="${k}"${on?' checked':''}${dis?' disabled':''} aria-label="${label}: ${esc(userName(u))}"><span>${on?'да':'нет'}</span></label>`};
+ const row=u=>{const on=u.role==='admin',st=on?'включён':u.role==='pending'?'не включён':'выключен';
+  return `<tr class="${on?'':'off'}"><td>${whoC(userName(u),u.last_sign_in?'вход: '+esc(ago(u.last_sign_in)):'ещё не входил')}</td><td><span class="login">${esc(u.username||loginOf(u.email))}</span></td><td><label class="switch"><input type="checkbox" data-access-user="${esc(u.id)}"${on?' checked':''} aria-label="Доступ: ${esc(userName(u))}"><span>${st}</span></label></td><td>${sw(u,'can_fin','Финансы')}</td><td>${sw(u,'can_del','Удаление')}</td><td class="num nolab"><span class="row-acts"><button type="button" class="link" data-act="user-edit" data-id="${esc(u.id)}">${ic('key')}Изменить</button><button type="button" class="link danger" data-act="user-del" data-id="${esc(u.id)}">Удалить</button></span></td></tr>`};
+ const ownRow=u=>`<tr class="own-row"><td>${whoC(userName(u),'владелец')}</td><td><span class="login">${esc(loginOf(u.email))}</span></td><td colspan="3"><span class="muted sm">полный доступ ко всему</span></td><td class="num nolab"><span class="row-acts"><button type="button" class="link" data-act="my-pw">${ic('key')}Сменить мой пароль</button></span></td></tr>`;
+ const table=`<div class="scroll"><table class="stack users"><thead><tr><th>Сотрудник</th><th>Имя для входа</th><th>Доступ</th><th>Финансы</th><th>Удаление</th><th></th></tr></thead><tbody>${own.map(ownRow).join('')}${staff.map(row).join('')}</tbody></table></div>`;
+ return table+(staff.length?'':emptyB('Сотрудников пока нет','Нажмите «Добавить пользователя», придумайте имя для входа и пароль и передайте их сотруднику.'))+
+  `<div class="panel-b rights"><p><b>Доступ</b> — может ли человек входить в базу. Выключенный сотрудник сразу теряет доступ ко всем данным.</p><p><b>Финансы</b> — видит зарплаты, ставки учителей и расходы. <b>Удаление</b> — может удалять учеников, оплаты, учителей и менять начисления.</p><p>Без этих прав сотрудник добавляет и меняет учеников, принимает оплаты и отмечает посещения.</p><div class="acts" style="justify-content:flex-start;margin-top:12px"><button type="button" data-act="preview-on">${ic('eye')}Посмотреть как сотрудник без прав</button></div></div>`}
+
+function vCfg(){const c=S.cfg;
+ return ph('Настройки','Сотрудники и их права, данные школы, резервная копия.',`<button class="pri" data-act="user-new">${ic('plus')}Добавить пользователя</button>`)+
+ `<div class="stack-gap">${panel('Пользователи',usersHTML(),S.users.length?S.users.length+' '+plural(S.users.length,'аккаунт','аккаунта','аккаунтов'):'')}
+ <form id="cfgForm" class="stack-gap">
+ ${panel('Школа',`<div class="panel-b"><div class="grid2">
+ <label><span class="req">Название школы</span><input name="schoolName" value="${esc(c.schoolName)}" required></label>
+ <label>Срок оплаты: до какого числа<input name="payDay" type="number" min="1" max="28" value="${esc(c.payDay)}"></label>
+ <label>Предупреждать об оплате за, дней<input name="warnDays" type="number" min="0" max="15" value="${esc(c.warnDays)}"></label>
+ <label style="grid-column:1/-1">Способы оплаты, каждый с новой строки<textarea name="payMethods">${esc((c.payMethods||[]).join('\n'))}</textarea></label>
+ <label style="grid-column:1/-1">Статьи расходов, каждая с новой строки<textarea name="expenseCats" style="min-height:180px">${esc((c.expenseCats||[]).join('\n'))}</textarea></label></div>
+ <div class="acts"><button class="pri" type="submit">Сохранить настройки школы</button></div></div>`)}
+ </form>
+ ${panel('Резервная копия',`<div class="panel-b"><p style="margin:0 0 12px;color:var(--ink-2)">Файл Excel со всеми данными: ученики, предметы, учителя и ставки, начисления, оплаты, посещения, расходы. Сохраняйте его раз в неделю и храните в надёжном месте: в нём личные данные.</p><button type="button" data-act="export">${ic('down')}Скачать копию всех данных (Excel)</button></div>`)}</div>`}
+
+/* ---------- сотрудники: создать, изменить, пароль ---------- */
+const TR={а:'a',ә:'a',б:'b',в:'v',г:'g',ғ:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'i',к:'k',қ:'k',л:'l',м:'m',н:'n',ң:'n',о:'o',ө:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ұ:'u',ү:'u',ф:'f',х:'h',һ:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sh',ъ:'',ы:'y',і:'i',ь:'',э:'e',ю:'yu',я:'ya'};
+const translit=t=>String(t||'').toLowerCase().split('').map(c=>TR[c]??c).join('');
+function suggestLogin(name){const p=translit(name).replace(/[^a-z0-9\s]/g,'').trim().split(/\s+/).filter(Boolean);let b=(p[0]||'').slice(0,20);if(b.length<3&&p[1])b=(b+'.'+p[1]).slice(0,20);if(!b)return '';
+ const taken=new Set(S.users.map(u=>u.username||loginOf(u.email)));let r=b.length>=3?b:b+'1',i=2;while(taken.has(r)){r=b+i;i++}return r}
+function genPw(){const A='abcdefghjkmnpqrstuvwxyz',D='23456789';const R=n=>{const a=new Uint32Array(n);crypto.getRandomValues(a);return [...a]};const r=R(8);
+ return [0,1,2,3].map(i=>A[r[i]%A.length]).join('')+[4,5,6,7].map(i=>D[r[i]%D.length]).join('')}
+const pwField=(lab,v)=>`<label><span class="req">${lab}</span><span class="pwrow"><input name="password" required minlength="6" maxlength="72" value="${esc(v)}" autocomplete="new-password" autocapitalize="none" spellcheck="false"><button type="button" class="icon" data-act="pw-gen" title="Придумать другой пароль" aria-label="Придумать другой пароль">${ic('dice')}</button></span><small>не меньше 6 символов</small></label>`;
+const userErr=e=>e&&e.code==='net'?'Нет связи с сервером':(e&&e.message)||'Не получилось';
+function userForm(){openDlg('Новый пользователь',`<form id="mf" autocomplete="off"><div class="grid2">
+ <label style="grid-column:1/-1"><span class="req">Имя и фамилия</span><input name="name" required maxlength="80" data-login-src></label>
+ <label><span class="req">Имя для входа</span><input name="username" required minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._\\-]{2,31}" autocapitalize="none" spellcheck="false" placeholder="например, aigerim" data-login-dst><small>латиница, цифры, точка или дефис</small></label>
+ ${pwField('Пароль',genPw())}</div>
+ <fieldset class="perms"><legend>Дополнительные права</legend>
+ <label class="check"><input type="checkbox" name="fin"> <span><b>Финансы</b>: видит зарплаты, ставки учителей и расходы</span></label>
+ <label class="check"><input type="checkbox" name="del"> <span><b>Удаление</b>: может удалять записи и менять начисления</span></label>
+ <p class="sample">Без них сотрудник добавляет учеников, принимает оплаты и отмечает посещения. Права можно поменять в любой момент.</p></fieldset>
+ <div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Создать аккаунт</button></div></form>`);
+ S.onSubmit=async fd=>{const name=(fd.get('name')||'').toString().trim(),username=(fd.get('username')||'').toString().trim().toLowerCase(),password=(fd.get('password')||'').toString();
+  if(!/^[a-z0-9][a-z0-9._-]{2,31}$/.test(username)){toast('Имя для входа: от 3 символов, латиница, цифры, точка или дефис');return}
+  if(password.length<6){toast('Пароль: не меньше 6 символов');return}
+  try{await api('POST','rpc/owner_create_user',{p_username:username,p_password:password,p_name:name,p_fin:fd.get('fin')==='on',p_del:fd.get('del')==='on'});await refresh();credDlg('Аккаунт создан',name,username,password)}catch(e){toast(userErr(e))}}}
+function userEdit(id){const u=S.users.find(x=>x.id===id);if(!u)return;const login=u.username||loginOf(u.email);
+ openDlg('Изменить: '+userName(u),`<form id="mf" autocomplete="off"><div class="grid2">
+ <label style="grid-column:1/-1"><span class="req">Имя и фамилия</span><input name="name" required maxlength="80" value="${esc(u.full_name||'')}"></label>
+ <label>Имя для входа<input value="${esc(login)}" disabled></label>
+ <label>Новый пароль<span class="pwrow"><input name="password" minlength="6" maxlength="72" placeholder="оставьте пустым, чтобы не менять" autocomplete="new-password" autocapitalize="none" spellcheck="false"><button type="button" class="icon" data-act="pw-gen" title="Придумать пароль" aria-label="Придумать пароль">${ic('dice')}</button></span><small>после смены сотрудник выйдет на всех устройствах</small></label></div>
+ <div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{const name=(fd.get('name')||'').toString().trim(),password=(fd.get('password')||'').toString();
+  if(password&&password.length<6){toast('Пароль: не меньше 6 символов');return}
+  try{if(name&&name!==(u.full_name||''))await api('PATCH','profiles?id=eq.'+id,{full_name:name},'return=minimal');
+   if(password)await api('POST','rpc/owner_set_password',{uid:id,p_password:password});
+   await refresh();if(password)credDlg('Пароль изменён',name||userName(u),login,password);else{closeDlg();toast('Сохранено')}}catch(e){toast(userErr(e))}}}
+function credDlg(title,name,login,password){S.cred=`${S.cfg.schoolName||'TEMTUR'}: вход в базу школы\nИмя для входа: ${login}\nПароль: ${password}`;
+ openDlg(title,`<p style="margin:0 0 14px">${name?'<b>'+esc(name)+'</b>: д':'Д'}анные для входа. Передайте их сотруднику.</p><div class="cred"><div><span>Имя для входа</span><b>${esc(login)}</b></div><div><span>Пароль</span><b>${esc(password)}</b></div></div><p class="sample">Пароль больше нигде не показывается. Если сотрудник его забудет, задайте новый: «Изменить» → «Новый пароль».</p><div class="acts"><button type="button" data-act="copy-cred">${ic('copy')}Скопировать для WhatsApp</button><button class="pri" type="button" data-act="close">Готово</button></div>`,true)}
+async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}a.remove();return ok}}
+function myPwForm(){openDlg('Сменить мой пароль',`<form id="mf" autocomplete="off"><label><span class="req">Новый пароль, не меньше 8 символов</span><input name="password" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label><label style="margin-top:14px"><span class="req">Повторите пароль</span><input name="password2" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label><div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сменить пароль</button></div></form>`,true);
+ S.onSubmit=async fd=>{const a=(fd.get('password')||'').toString(),b=(fd.get('password2')||'').toString();if(a.length<8){toast('Не меньше 8 символов');return}if(a!==b){toast('Пароли не совпадают');return}
+  try{await authCall('PUT','user',{password:a},await token());closeDlg();toast('Пароль изменён')}catch(e){toast(authErr(e))}}}
+
+
+function render(){S.acc=new Map();document.body.classList.toggle('no-own',isAdm());document.body.classList.toggle('no-fin',noFin());document.body.classList.toggle('no-del',noDel());$('#preview').style.display=S.preview?'':'none';const v=view();
+ for(const a of document.querySelectorAll('#nav a,#tabbar a'))a.classList.toggle('on',a.dataset.v===v);
+ $('#schoolName').textContent=!S.cfg.schoolName||S.cfg.schoolName==='TEMTUR'?'база школы':S.cfg.schoolName;document.title=(S.cfg.schoolName||'TEMTUR')+' — база школы';
+ const rn=$('#roleName');if(rn)rn.textContent=S.role==='owner'?(S.preview?'владелец, вид администратора':'владелец'):S.role==='admin'?'администратор':'';
+ const focus=document.activeElement&&document.activeElement.id;const pos=focus==='q'?document.activeElement.selectionStart:null;
+ $('#main').innerHTML=({panel:vPanel,home:vHome,students:vStudents,payments:vPayments,salary:vSalary,finance:vFinance,schedule:vSchedule,attendance:vAttendance,teachers:vTeachers,subjects:vSubjects,nastroiki:vCfg})[v]();
+ if(focus==='q'){const q=$('#q');if(q){q.focus();q.setSelectionRange(pos,pos)}}}
+const menu=open=>{$('#side').classList.toggle('open',open);$('#scrim').classList.toggle('open',open)};
+
+/* ---------- окна ---------- */
+function enrRows(){return S.enrDraft.map((e,i)=>`<div class="enr-row" data-i="${i}">
+ <label class="full">Предмет<select name="es">${['<option value="">— выберите —</option>',...[...S.subjects].sort(byName).map(s=>`<option value="${esc(s.id)}"${e.subjectId===s.id?' selected':''}>${esc(s.name)}</option>`)].join('')}</select></label>
+ <label>Формат<select name="ef"><option value="ind"${e.format==='ind'?' selected':''}>Индивидуально</option><option value="group"${e.format==='group'?' selected':''}>В группе</option></select></label>
+ <label>Скидка<select name="edt"><option value="none">Нет</option><option value="pct"${e.discType==='pct'?' selected':''}>В процентах</option><option value="sum"${e.discType==='sum'?' selected':''}>В тенге</option></select></label>
+ <label>Размер<input name="edv" type="number" min="0" step="any" inputmode="decimal" value="${esc(e.discVal??'')}"></label>
+ <button type="button" class="link danger" data-act="enr-del" data-i="${i}" aria-label="Убрать предмет">Убрать</button>
+ <div class="full slots" style="grid-column:1/-1"><span class="muted sm">Дни и время:</span>${(e.slots||[]).map((x,j)=>`<span class="slot"><select name="sd" aria-label="День">${WD.map((w,k)=>k?`<option value="${k}"${Number(x.d)===k?' selected':''}>${w}</option>`:'').join('')}</select><input name="stt" type="time" value="${esc(x.t||'')}" aria-label="Время"><button type="button" class="link" data-act="slot-del" data-i="${i}" data-j="${j}" aria-label="Убрать занятие" style="min-height:28px;padding:0 6px">×</button></span>`).join('')}<button type="button" class="link" data-act="slot-add" data-i="${i}">+ день</button></div></div>`).join('')||'<p class="muted">Предметы не выбраны.</p>'}
+function syncEnr(){S.enrDraft=[...document.querySelectorAll('.enr-row')].map(r=>({subjectId:r.querySelector('[name=es]').value,format:r.querySelector('[name=ef]').value,discType:r.querySelector('[name=edt]').value,discVal:r.querySelector('[name=edv]').value===''?'':Number(r.querySelector('[name=edv]').value),slots:[...r.querySelectorAll('.slot')].map(x=>({d:Number(x.querySelector('[name=sd]').value),t:x.querySelector('[name=stt]').value}))}))}
+
+function stForm(st){st=st||{enrollDate:todayS()};S.enrDraft=(st.enr||[]).map(e=>({...e}));if(!S.enrDraft.length)S.enrDraft=[{subjectId:'',format:'group',discType:'none',discVal:'',slots:[]}];
+ openDlg(st.id?'Изменить ученика':'Новый ученик',`<form id="mf"><h3 style="margin-top:0">Данные ученика</h3><div class="grid2">${F_ST.map(f=>field(f,st)).join('')}</div>
+ <h3>Предметы и расписание</h3><div id="enr">${enrRows()}</div><button type="button" class="link" data-act="enr-add">+ Добавить предмет</button>
+ <div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{syncEnr();const o=readForm(F_ST,fd);if(!o.fio||!o.enrollDate){toast('Заполните ФИО и дату записи');return}
+  const id=st.id||newId('students');const data={...st,...o,id:undefined,enr:S.enrDraft.filter(e=>e.subjectId),status:st.status||'active',createdAt:st.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};delete data.id;
+  if(await save('students/'+id,data)){
+   /* пересчитать неоплаченные, не изменённые вручную начисления текущего месяца */
+   const ns={...data,id};const cur=ymOf(todayS());const a=acct(ns);
+   for(const c of chargesOf(id)){if(c.editedAt||c.period!==cur||(a.covered[c.id]||0)>0)continue;const nc=buildCharge(ns,c.period);if(nc.amount!==c.amount||nc.due!==c.due){const d={...c,amount:nc.amount,due:nc.due,detail:nc.detail};delete d.id;await save('charges/'+c.id,d)}}
+   closeDlg();toast('Ученик сохранён');setTimeout(()=>openStudent(id),300)}}}
+
+function openStudent(id){const st=S.students.find(s=>s.id===id);if(!st){toast('Ученик ещё загружается');return}
+ const fm=firstMonth(st);const pd=st.payDay||S.cfg.payDay;const a=acct(st);const dd=(l,v)=>`<div><dt>${l}</dt><dd>${v}</dd></div>`;const t=k=>esc(st[k]||'—');
+ openDlg(st.fio,`${st.status==='archive'?'<div class="note">Ученик в архиве. Новые начисления не создаются.</div>':''}
+ <div class="sum"><div><div class="l">В месяц</div><div class="v">${money(monthTotal(st))}</div></div><div><div class="l">Баланс</div><div class="v${a.bal<0?' red':''}">${money(a.bal)}</div></div><div><div class="l">Оплата</div><div style="margin-top:6px">${pill(a)}</div></div><div><div class="l">Оплата до</div><div class="v">${esc(pd)}-го числа</div></div></div>
+ <div class="acts" style="justify-content:flex-start;margin:0 0 4px"><button class="pri" data-act="pay-new" data-id="${esc(id)}">${ic('pay')}Принять оплату</button><button data-act="st-edit" data-id="${esc(id)}">Изменить</button>${st.status==='archive'?`<button data-act="st-restore" data-id="${esc(id)}">Вернуть из архива</button><button class="danger" data-act="st-del" data-id="${esc(id)}">Удалить навсегда</button>`:`<button data-act="st-arch" data-id="${esc(id)}">В архив</button>`}</div>
+ <h3>Предметы и расписание</h3>${(st.enr||[]).length?`<div class="panel"><div class="scroll"><table class="stack"><thead><tr><th>Предмет</th><th>Учитель</th><th>Формат</th><th>Расписание</th><th class="num">Цена</th><th class="num">Скидка</th><th class="num">Итого</th></tr></thead><tbody>${st.enr.map(e=>{const s=sub(e.subjectId);return `<tr><td><b>${esc(s?.name||'удалён')}</b></td><td>${esc(teach(s?.teacherId)?.fio||'—')}</td><td>${FMT[e.format]}</td><td>${esc(slotTxt(e)||'—')}</td><td class="num">${money(basePrice(e))}</td><td class="num">${discTxt(e)}</td><td class="num"><b>${money(price(e))}</b></td></tr>`}).join('')}</tbody></table></div></div>`:'<p class="muted">Предметы не выбраны.</p>'}
+ ${fm?`<div class="calc">Первый месяц: ${money(fm.total)} × ${fm.left} дн. ÷ ${fm.dim} = <b>${money(fm.sum)}</b>. Ждём оплату: ${fdate(st.expectedPayDate||st.enrollDate)}.</div>`:''}
+ ${accHTML(st)}
+ <h3>Данные ученика</h3><dl>${dd('Дата записи',fdate(st.enrollDate))}${dd('Дата рождения',fdate(st.birth))}${dd('ИИН',t('iin'))}${dd('Школа и класс',t('school'))}${dd('Телефон ученика',t('phone'))}${dd('Родитель',t('parentFio'))}${dd('Телефон родителя',t('parentPhone'))}${dd('Адрес',t('address'))}${dd('День оплаты','до '+esc(pd)+'-го числа'+(st.payDay?', свой':', общий'))}${st.notes?dd('Заметки',t('notes')):''}</dl>`);S.openSt=id}
+
+function accHTML(st){const a=acct(st);const pays=paysOf(st.id);
+ return `<h3>Начисления по месяцам</h3>${a.ch.length?`<div class="panel"><div class="scroll"><table class="stack"><thead><tr><th>Месяц</th><th class="num">Начислено</th><th>Срок</th><th class="num">Покрыто</th><th></th></tr></thead><tbody>${[...a.ch].reverse().map(c=>{const cov=a.covered[c.id]||0;const cr=creditFor(st,prevYm(c.period));const full=cov>=effAmt(st,c);const late=!full&&dayDiff(todayS(),c.due)>0;
+  return `<tr class="${late?'late':''}"><td class="nw">${fym(c.period)}${c.kind==='first'?' <span class="tag g">первый, '+esc(c.detail)+'</span>':''}${c.note?'<br><span class="muted sm">'+esc(c.note)+'</span>':''}</td><td class="num">${money(effAmt(st,c))}${cr.sum?'<br><span class="muted sm">'+money(c.amount)+' − '+money(cr.sum)+' за '+cr.n+' зан. по болезни</span>':''}</td><td class="nw${late?' red':''}">${fdate(c.due)}</td><td class="num">${full?'<span class="pill ok">полностью</span>':money(cov)}</td><td class="num nolab"><button class="link" data-act="ch-edit" data-id="${esc(c.id)}">Изменить</button></td></tr>`}).join('')}</tbody></table></div></div>`:'<p class="muted">Начислений пока нет: они создаются автоматически по дате записи.</p>'}
+ <div class="sum" style="margin-top:12px"><div><div class="l">Начислено всего</div><div class="v">${money(a.due)}</div></div><div><div class="l">Оплачено всего</div><div class="v">${money(a.paid)}</div></div></div>
+ ${attHTML(st)}
+ <h3>История оплат</h3>${pays.length?`<div class="panel"><div class="scroll"><table class="stack"><thead><tr><th>Дата</th><th class="num">Сумма</th><th>Способ</th><th>За месяц</th><th>Заметка</th></tr></thead><tbody>${pays.map(p=>`<tr><td class="nw">${fdate(p.date)}</td><td class="num"><b>${money(p.amount)}</b></td><td>${esc(p.method||'—')}</td><td class="nw">${fym(p.period)}</td><td>${esc(p.note||'')}</td></tr>`).join('')}</tbody></table></div></div>`:'<p class="muted">Оплат пока не было.</p>'}`}
+
+function attHTML(st){const p=ymOf(todayS());const list=attMonth(st.id,p);const c={present:0,sick:0,absent:0};for(const x of list)c[x.mark]=(c[x.mark]||0)+1;
+ return `<h3>Посещения за ${fym(p)}</h3>${list.length?`<div class="chips" style="margin:0 0 10px"><span class="chip present">был: ${c.present}</span><span class="chip sick">болел: ${c.sick}</span><span class="chip absent">прогул: ${c.absent}</span></div><div class="panel"><div class="scroll"><table class="stack"><thead><tr><th>Дата</th><th>Предмет</th><th>Время</th><th>Отметка</th></tr></thead><tbody>${list.map(x=>`<tr><td class="nw">${fdate(x.date)}</td><td>${esc(sub(x.subj)?.name||'—')}</td><td class="nw">${esc(x.t)}</td><td><span class="chip ${esc(x.mark)}">${MARKS[x.mark]}</span></td></tr>`).join('')}</tbody></table></div></div>`:'<p class="muted">Отметок в этом месяце нет.</p>'}`}
+
+function payForm(sid){const st=S.students.find(s=>s.id===sid);const a=st?acct(st):null;const list=active().sort(byName);
+ const d={studentId:sid||'',amount:a&&a.bal<0?-a.bal:'',method:(S.cfg.payMethods||[])[0]||'',date:todayS(),period:a&&a.open?a.open.c.period:ymOf(todayS()),note:''};
+ const F=[{k:'studentId',l:'Ученик',req:1,t:'select',o:[['','— выберите —'],...list.map(s=>[s.id,s.fio])]},{k:'amount',l:'Сумма, ₸',t:'number',req:1},{k:'method',l:'Способ оплаты',t:'select',o:(S.cfg.payMethods||[]).map(m=>[m,m])},{k:'date',l:'Дата оплаты',t:'date',req:1},{k:'period',l:'За какой месяц',t:'month'},{k:'note',l:'Заметка'}];
+ openDlg('Принять оплату',`<form id="mf">${a?`<div class="sum"><div><div class="l">Ученик</div><div class="v" style="font-size:16px">${esc(st.fio)}</div></div><div><div class="l">Текущий долг</div><div class="v${a.bal<0?' red':''}">${money(Math.max(0,-a.bal))}</div></div></div>`:''}<div class="grid2">${F.map(f=>field(f,d)).join('')}</div>${a?`<p class="sample">Можно принять часть суммы — остаток останется долгом.</p>`:''}<div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить оплату</button></div></form>`);
+ S.onSubmit=async fd=>{const o=readForm(F,fd);if(!o.studentId||!(o.amount>0)||!o.date){toast('Выберите ученика, сумму и дату');return}
+  const id=newId('payments');if(await save('payments/'+id,{...o,createdAt:new Date().toISOString()})){closeDlg();toast('Оплата сохранена: '+money(o.amount));openStudent(o.studentId)}}}
+
+function chForm(cid){const c=S.charges.find(x=>x.id===cid);if(!c)return;const st=S.students.find(s=>s.id===c.studentId);
+ const F=[{k:'amount',l:'Сумма начисления, ₸',t:'number',req:1},{k:'due',l:'Срок оплаты',t:'date',req:1},{k:'note',l:'Причина изменения'}];
+ const calc=st?buildCharge(st,c.period).amount:0;
+ openDlg('Начисление: '+fym(c.period),`<form id="mf"><div class="grid2">${F.map(f=>field(f,c)).join('')}</div><p class="sample">По текущим ценам и скидкам было бы: ${money(calc)}.</p><div class="acts"><button type="button" data-act="ch-recalc" data-id="${esc(cid)}">Пересчитать по текущим ценам</button><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{const o=readForm(F,fd);if(o.amount===''||!o.due){toast('Укажите сумму и срок');return}const d={...c,...o,amount:Number(o.amount),editedAt:new Date().toISOString()};delete d.id;
+  if(await save('charges/'+cid,d)){closeDlg();toast('Начисление изменено');openStudent(c.studentId)}}}
+
+async function genCharges(){if(S.genBusy||!S.db)return;S.genBusy=true;
+ try{const rows=[];for(const st of S.students){for(const p of periodsFor(st)){const id=st.id+'_'+p;if(S.chargeIds.has(id))continue;S.chargeIds.add(id);rows.push(chargeRow(buildCharge(st,p)))}}
+  if(rows.length){await api('POST','charges?on_conflict=student_id,period',rows,'resolution=ignore-duplicates,return=minimal');await refresh()}}
+ catch(e){}finally{S.genBusy=false}}
+
+function expForm(tid){const t=tid&&teach(tid);const p=S.fMonth||ymOf(todayS());
+ const left=t?salaryRows(t,p).reduce((a,x)=>a+x.amt,0)-salPaid(t.id,p):'';
+ const cats=S.cfg.expenseCats||[];const d={date:todayS(),cat:t?'Зарплаты':cats[0]||'',amount:t?Math.max(0,left):'',method:(S.cfg.payMethods||[])[0]||'',note:t?'Зарплата: '+t.fio:''};
+ const F=[{k:'date',l:'Дата',t:'date',req:1},{k:'cat',l:'Статья расхода',t:'select',o:cats.map(c=>[c,c])},{k:'newCat',l:'Или новая статья'},{k:'amount',l:'Сумма, ₸',t:'number',req:1},{k:'method',l:'Способ',t:'select',o:[['',''],...(S.cfg.payMethods||[]).map(m=>[m,m])]},{k:'note',l:'Комментарий'}];
+ openDlg(t?'Выплата зарплаты за '+fym(p).replace(/&[^;]+;/g,''):'Новый расход',`<form id="mf"><div class="grid2">${F.filter(f=>!(t&&f.k==='newCat')).map(f=>field(f,d)).join('')}</div><div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{const o=readForm(F,fd);if(!(o.amount>0)||!o.date){toast('Укажите дату и сумму');return}
+  let cat=o.newCat||o.cat;delete o.newCat;
+  if(cat&&!cats.includes(cat)&&S.role==='owner'){const nc={...S.cfg,expenseCats:[...cats,cat]};await save('config/main',nc)}
+  const data={...o,cat,createdAt:new Date().toISOString()};if(t){data.teacherId=t.id;data.period=p;data.cat='Зарплаты'}
+  if(await save('expenses/'+newId('expenses'),data)){closeDlg();toast('Расход сохранён: '+money(o.amount))}}}
+
+function tForm(t){t=t||{};openDlg(t.id?'Изменить учителя':'Новый учитель',`<form id="mf"><div class="grid2">${F_T.map(f=>field(f,t)).join('')}</div><div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{const o=readForm(F_T,fd);if(!o.fio){toast('Заполните ФИО');return}const id=t.id||newId('teachers');const data={...t,...o};delete data.id;if(await save('teachers/'+id,data)){closeDlg();toast('Учитель сохранён')}}}
+
+function openTeacher(id){const t=teach(id);if(!t)return;const r=teacherRows(t);const dd=(l,v,c)=>`<div${c?` class="${c}"`:''}><dt>${l}</dt><dd>${v}</dd></div>`;const x=k=>esc(t[k]||'—');
+ const p=ymOf(todayS());const sr=salaryRows(t,p);const real=sr.reduce((a,y)=>a+y.amt,0);
+ openDlg(t.fio,`<div class="sum"><div><div class="l">Учеников</div><div class="v">${new Set(r.map(y=>y.st.id)).size}</div></div><div><div class="l">Предметов</div><div class="v">${S.subjects.filter(s=>s.teacherId===id).length}</div></div><div class="fin"><div class="l">Зарплата при полной оплате</div><div class="v">${money(r.reduce((a,y)=>a+y.amt,0))}</div></div><div class="fin"><div class="l">За ${fym(p)} по оплатам</div><div class="v">${money(real)}</div></div></div>
+ <div class="acts" style="justify-content:flex-start;margin:0 0 4px"><button class="pri" data-act="t-edit" data-id="${esc(id)}">Изменить</button><button class="danger" data-act="t-del" data-id="${esc(id)}">Удалить</button></div>
+ <h3>Ученики учителя</h3>${r.length?`<div class="panel"><div class="scroll"><table class="stack"><thead><tr><th>Ученик</th><th>Предмет</th><th>Формат</th><th class="num fin">Учителю</th></tr></thead><tbody>${r.map(y=>`<tr><td>${esc(y.st.fio)}</td><td>${esc(y.s.name)}</td><td>${FMT[y.e.format]}</td><td class="num fin">${money(y.amt)}</td></tr>`).join('')}</tbody></table></div></div>`:'<p class="muted">Учеников пока нет.</p>'}
+ <h3>Данные учителя</h3><dl>${dd('Телефон',x('phone'))}${dd('ИИН',x('iin'))}${dd('Дата рождения',fdate(t.birth))}${dd('Карта или счёт',x('card'))}${dd('Начало работы',fdate(t.startDate))}${dd('За индивидуального',money(t.rateInd)+' в месяц','fin')}${dd('За ученика в группе',money(t.rateGroup)+' в месяц','fin')}${t.notes?dd('Заметки',x('notes')):''}</dl>
+ <p class="sample fin">Выплачено за ${fym(p)}: ${money(salPaid(t.id,p))}.</p>`)}
+
+function sForm(s){s=s||{};const F=F_S();openDlg(s.id?'Изменить предмет':'Новый предмет',`<form id="mf"><div class="grid2">${F.map(f=>field(f,s)).join('')}</div><div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{const o=readForm(F,fd);if(!o.name){toast('Заполните название');return}const id=s.id||newId('subjects');const data={...s,...o};delete data.id;if(await save('subjects/'+id,data)){closeDlg();toast('Предмет сохранён')}}}
+
+/* ---------- events ---------- */
+document.addEventListener('click',async ev=>{const b=ev.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id;
+ if(a==='close'){closeDlg();return}
+ if(a==='yes'){const fn=S.onConfirm;closeDlg();fn&&fn();return}
+ if(a.startsWith('auth-')){authAction(a,b);return}if(a==='logout'){storeSession(null);location.reload();return}
+ if(a==='menu'){menu(!$('#side').classList.contains('open'));return}if(a==='menu-close'){menu(false);return}
+ if(!S.db){toast('Нет связи с базой');return}
+ const st=S.students.find(s=>s.id===id);
+ if(noDel()&&['st-del','pay-del','exp-del','t-del','s-del','ch-edit','ch-recalc'].includes(a)){toast('Нет прав: обратитесь к владельцу');return}
+ if(noFin()&&a==='sal-pay'){toast('Нет прав');return}
+ switch(a){
+ case 'st-new':stForm();break;
+ case 'st-open':openStudent(id);break;
+ case 'st-edit':stForm(st);break;
+ case 'st-arch':confirmDlg('Перенести «'+st.fio+'» в архив? История сохранится.',async()=>{const d={...st,status:'archive',archivedAt:new Date().toISOString().slice(0,10)};delete d.id;if(await save('students/'+id,d))toast('Перенесён в архив')});break;
+ case 'st-restore':{const d={...st,status:'active'};delete d.id;delete d.archivedAt;if(await save('students/'+id,d)){toast('Ученик снова активен');openStudent(id)}break}
+ case 'st-del':confirmDlg('Удалить «'+st.fio+'» навсегда вместе с начислениями и оплатами? Это нельзя отменить.',async()=>{for(const c of chargesOf(id))await del('charges/'+c.id);for(const p of paysOf(id))await del('payments/'+p.id);if(await del('students/'+id))toast('Удалён')});break;
+ case 'pay-new':payForm(id);break;
+ case 'export':if(S.role!=='owner'||S.preview){toast('Только владелец');break}exportXlsx();break;
+ case 'user-new':if(S.role==='owner'&&!S.preview)userForm();break;
+ case 'user-edit':if(S.role==='owner'&&!S.preview)userEdit(id);break;
+ case 'my-pw':myPwForm();break;
+ case 'pw-gen':{const i=b.closest('.pwrow')&&b.closest('.pwrow').querySelector('input');if(i){i.value=genPw();i.focus()}break}
+ case 'copy-cred':if(await copyText(S.cred||''))toast('Скопировано. Вставьте в WhatsApp');else toast('Не получилось скопировать: выделите текст вручную');break;
+ case 'user-del':{const u=S.users.find(x=>x.id===id);if(!u)break;confirmDlg('Удалить аккаунт «'+userName(u)+'»? Человек больше не сможет войти. Его записи (ученики, оплаты) останутся.',async()=>{try{await api('POST','rpc/owner_delete_user',{uid:id});toast('Аккаунт удалён');await refresh()}catch(e){toast(userErr(e))}});break}
+ case 'go-att':S.aDate=b.dataset.date||todayS();location.hash='attendance';break;
+ case 'preview-on':S.preview=true;if(location.hash==='#panel')render();else location.hash='panel';window.scrollTo(0,0);break;
+ case 'preview-off':S.preview=false;location.hash='nastroiki';render();break;
+ case 'exp-new':expForm();break;
+ case 'sal-pay':expForm(id);break;
+ case 'exp-del':{const x=S.expenses.find(e=>e.id===id);confirmDlg(`Удалить расход ${money(x.amount)} (${x.cat||'без статьи'}) от ${fdate(x.date)}?`,async()=>{if(await del('expenses/'+id))toast('Расход удалён')});break}
+ case 'pay-del':{const p=S.payments.find(x=>x.id===id);confirmDlg(`Удалить оплату ${money(p.amount)} от ${fdate(p.date)}?`,async()=>{if(await del('payments/'+id))toast('Оплата удалена')});break}
+ case 'ch-edit':chForm(id);break;
+ case 'ch-recalc':{const c=S.charges.find(x=>x.id===id);const s2=S.students.find(s=>s.id===c.studentId);if(!s2)break;const nc=buildCharge(s2,c.period);const d={...c,amount:nc.amount,detail:nc.detail,editedAt:new Date().toISOString(),note:'пересчитано'};delete d.id;if(await save('charges/'+id,d)){closeDlg();toast('Пересчитано: '+money(nc.amount));openStudent(c.studentId)}break}
+ case 'enr-add':syncEnr();S.enrDraft.push({subjectId:'',format:'group',discType:'none',discVal:'',slots:[]});$('#enr').innerHTML=enrRows();break;
+ case 'slot-add':syncEnr();{const e=S.enrDraft[Number(b.dataset.i)];e.slots=[...(e.slots||[]),{d:1,t:'15:00'}]}$('#enr').innerHTML=enrRows();break;
+ case 'slot-del':syncEnr();S.enrDraft[Number(b.dataset.i)].slots.splice(Number(b.dataset.j),1);$('#enr').innerHTML=enrRows();break;
+ case 'att':{const date=b.dataset.date,k=b.dataset.k,m=b.dataset.m;const cur=((S.att[date]||{}).marks||{})[k]||'';const nv=cur===m?'':m;const marks={...((S.att[date]||{}).marks||{}),[k]:nv};
+  S.att[date]={date,marks};render();const[sid,subj,tm]=k.split('|');
+  try{if(nv)await api('POST','attendance?on_conflict=date,student_id,subject_id,time',[{date,student_id:sid,subject_id:subj,time:tm||'',mark:nv}],'resolution=merge-duplicates,return=minimal');
+   else await api('DELETE',`attendance?date=eq.${date}&student_id=eq.${sid}&subject_id=eq.${subj}&time=eq.${encodeURIComponent(tm||'')}`);await refresh()}catch(e){toast('Отметка не сохранилась: '+errText(e));await refresh()}break}
+ case 'enr-del':syncEnr();S.enrDraft.splice(Number(b.dataset.i),1);$('#enr').innerHTML=enrRows();break;
+ case 't-new':tForm();break;
+ case 't-open':openTeacher(id);break;
+ case 't-edit':tForm(teach(id));break;
+ case 't-del':{const t=teach(id);const n=S.subjects.filter(s=>s.teacherId===id).length;confirmDlg(`Удалить учителя «${t.fio}»?${n?' Его предметы ('+n+') останутся без учителя.':''}`,async()=>{if(await del('teachers/'+id))toast('Учитель удалён')});break}
+ case 's-new':sForm();break;
+ case 's-edit':sForm(sub(id));break;
+ case 's-del':{const s=sub(id);const n=active().filter(x=>(x.enr||[]).some(e=>e.subjectId===id)).length;confirmDlg(`Удалить предмет «${s.name}»?${n?' Его изучают '+n+' учен. — у них он останется как «удалён».':''}`,async()=>{if(await del('subjects/'+id))toast('Предмет удалён')});break}
+ }});
+document.addEventListener('submit',async ev=>{ev.preventDefault();const f=ev.target;
+ if(f.id==='mf'&&S.onSubmit){const btn=f.querySelector('[type=submit]');btn.disabled=true;await S.onSubmit(new FormData(f));btn.disabled=false}
+ if(f.id==='cfgForm'){const fd=new FormData(f);const lines=k=>(fd.get(k)||'').toString().split('\n').map(x=>x.trim()).filter(Boolean);
+  const d={schoolName:(fd.get('schoolName')||'').toString().trim()||'TEMTUR',payDay:Math.min(28,Math.max(1,Number(fd.get('payDay'))||10)),warnDays:Math.max(0,Number(fd.get('warnDays'))||0),payMethods:lines('payMethods'),expenseCats:lines('expenseCats')};
+  if(await save('config/main',d))toast('Настройки сохранены')}});
+document.addEventListener('input',ev=>{const t=ev.target;if(t.id==='q'){S.q=t.value;render();return}
+ if(t.matches('[data-login-src]')){const d=$('#mf [data-login-dst]');if(d&&!d.dataset.touched)d.value=suggestLogin(t.value);return}
+ if(t.matches('[data-login-dst]')){t.dataset.touched='1';const v=t.value.toLowerCase().replace(/\s+/g,'');if(v!==t.value)t.value=v}});
+document.addEventListener('change',async ev=>{const t=ev.target;
+ if(t.dataset.accessUser){const on=t.checked;try{await api('PATCH','profiles?id=eq.'+t.dataset.accessUser,{role:on?'admin':'blocked'},'return=minimal');toast(on?'Доступ включён':'Доступ выключен');await refresh()}catch(e){toast(errText(e));t.checked=!on}return}
+ if(t.dataset.permUser){const on=t.checked,k=t.dataset.perm;if(k!=='can_fin'&&k!=='can_del')return;try{await api('PATCH','profiles?id=eq.'+t.dataset.permUser,{[k]:on},'return=minimal');toast((k==='can_fin'?'Финансы':'Удаление')+': '+(on?'разрешено':'запрещено'));await refresh()}catch(e){toast(errText(e));t.checked=!on}return}if(t.id==='fSub'){S.fSub=t.value;render()}if(t.id==='fTeach'){S.fTeach=t.value;render()}if(t.id==='fStat'){S.fStat=t.value;render()}if(t.id==='pMonth'){S.pMonth=t.value;render()}if(t.id==='aDate'){S.aDate=t.value;render()}if(t.id==='fMonth'){S.fMonth=t.value;render()}if(t.id==='schT'){S.schT=t.value;render()}});
+document.addEventListener('keydown',ev=>{if(ev.key!=='Escape')return;if($('#ov').classList.contains('open'))closeDlg();else menu(false)});
+$('#ov').addEventListener('click',ev=>{if(ev.target.id==='ov')closeDlg()});
+window.addEventListener('hashchange',()=>{menu(false);render();window.scrollTo(0,0);if(S.db)refresh()});
+
+/* ---------- Excel (.xlsx) без внешних библиотек ---------- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+function zipStore(files){const enc=new TextEncoder();const parts=[],cd=[];let off=0;
+ for(const f of files){const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+  const lh=new DataView(new ArrayBuffer(30));lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,name.length,true);
+  parts.push(new Uint8Array(lh.buffer),name,data);
+  const ch=new DataView(new ArrayBuffer(46));ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint32(16,crc,true);ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,name.length,true);ch.setUint32(42,off,true);
+  cd.push(new Uint8Array(ch.buffer),name);off+=30+name.length+data.length}
+ const cdLen=cd.reduce((a,b)=>a+b.length,0);const end=new DataView(new ArrayBuffer(22));end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cdLen,true);end.setUint32(16,off,true);
+ return new Blob([...parts,...cd,new Uint8Array(end.buffer)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})}
+const xe=v=>String(v??'').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const colN=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s};
+function sheetXml(rows){return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+rows.map((r,ri)=>'<row r="'+(ri+1)+'">'+r.map((v,ci)=>{const ref=colN(ci)+(ri+1);
+ if(typeof v==='number'&&isFinite(v))return '<c r="'+ref+'"><v>'+v+'</v></c>';const s=String(v??'');
+ /* защита от формул: текст, начинающийся с = + - @, Excel не выполнит — ячейки строковые */
+ return '<c r="'+ref+'" t="inlineStr"'+(ri===0?' s="1"':'')+'><is><t xml:space="preserve">'+xe(s)+'</t></is></c>'}).join('')+'</row>').join('')+'</sheetData></worksheet>'}
+function buildXlsx(sheets){const wb='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+sheets.map((s,i)=>'<sheet name="'+xe(s.name.slice(0,31))+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets></workbook>';
+ const rels='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((s,i)=>'<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')+'<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+ const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+ const ct='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sheets.map((s,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'</Types>';
+ const root='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+ return zipStore([{name:'[Content_Types].xml',data:ct},{name:'_rels/.rels',data:root},{name:'xl/workbook.xml',data:wb},{name:'xl/_rels/workbook.xml.rels',data:rels},{name:'xl/styles.xml',data:styles},...sheets.map((s,i)=>({name:'xl/worksheets/sheet'+(i+1)+'.xml',data:sheetXml(s.rows)}))])}
+async function exportXlsx(){try{await refresh()}catch(e){}
+ const stn=id=>(S.students.find(s=>s.id===id)||{}).fio||'';const sbn=id=>(sub(id)||{}).name||'';const tn=id=>(teach(id)||{}).fio||'';
+ const sheets=[
+  {name:'Ученики',rows:[['ФИО','Статус','Дата записи','Дата рождения','ИИН','Школа и класс','Телефон','Родитель','Телефон родителя','Адрес','Свой день оплаты','Начислять с','Ждём первую оплату','В архиве с','В месяц, ₸','Баланс, ₸','Заметки'],...[...S.students].sort(byName).map(s=>{const a=acct(s);return[s.fio,s.status==='archive'?'архив':'активен',s.enrollDate,s.birth,s.iin,s.school,s.phone,s.parentFio,s.parentPhone,s.address,s.payDay,s.billFrom,s.expectedPayDate,s.archivedAt,monthTotal(s),a.bal,s.notes]})]},
+  {name:'Предметы учеников',rows:[['Ученик','Предмет','Учитель','Формат','Скидка','Расписание','Цена, ₸'],...S.students.flatMap(s=>(s.enr||[]).map(e=>[s.fio,sbn(e.subjectId),tn(sub(e.subjectId)?.teacherId),FMT[e.format],discTxt(e).replace(/ /g,' '),slotTxt(e),price(e)]))]},
+  {name:'Учителя',rows:[['ФИО','Телефон','ИИН','Дата рождения','Карта или счёт','Начало работы','За индивидуального, ₸','За ученика в группе, ₸','Заметки'],...[...S.teachers].sort(byName).map(t=>[t.fio,t.phone,t.iin,t.birth,t.card,t.startDate,Number(t.rateInd)||0,Number(t.rateGroup)||0,t.notes])]},
+  {name:'Предметы',rows:[['Предмет','Учитель','Индивидуально, ₸','В группе, ₸'],...[...S.subjects].sort(byName).map(s=>[s.name,tn(s.teacherId),Number(s.priceInd)||0,Number(s.priceGroup)||0])]},
+  {name:'Начисления',rows:[['Ученик','Месяц','Начислено, ₸','С перерасчётом, ₸','Срок','Тип','Заметка'],...S.charges.map(c=>{const st=S.students.find(s=>s.id===c.studentId);return[stn(c.studentId),c.period,Number(c.amount)||0,st?effAmt(st,c):Number(c.amount)||0,c.due,c.kind==='first'?'первый месяц':'месяц',c.note]})]},
+  {name:'Оплаты',rows:[['Дата','Ученик','Сумма, ₸','Способ','За месяц','Заметка'],...[...S.payments].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(p=>[p.date,stn(p.studentId),Number(p.amount)||0,p.method,p.period,p.note])]},
+  {name:'Посещения',rows:[['Дата','Ученик','Предмет','Время','Отметка'],...Object.values(S.att).flatMap(d=>Object.entries(d.marks||{}).filter(([k,v])=>v).map(([k,v])=>{const[s,su,t]=k.split('|');return[d.date,stn(s),sbn(su),t,MARKS[v]]})).sort((a,b)=>String(a[0]).localeCompare(String(b[0])))]},
+  {name:'Расходы',rows:[['Дата','Статья','Сумма, ₸','Способ','Учитель','За месяц','Комментарий'],...[...S.expenses].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(x=>[x.date,x.cat,Number(x.amount)||0,x.method,tn(x.teacherId),x.period,x.note])]}];
+ const blob=buildXlsx(sheets);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='TEMTUR-копия-'+todayS()+'.xlsx';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('Файл сохранён в «Загрузки»')}
+
+
+/* ---------- Supabase ---------- */
+const SBO=(()=>{try{return JSON.parse(localStorage.getItem('temtur.sb')||'null')}catch(e){return null}})();
+const SB_URL=SBO&&SBO.url||'https://rqpttmkqpbjxtpfowolf.supabase.co';
+const SB_KEY=SBO&&SBO.key||'sb_publishable_1tK6e8YrpSXnHaIQ2Z7nrQ_yV_YA6Sc';
+let SESSION=(()=>{try{return JSON.parse(localStorage.getItem('temtur.session')||'null')}catch(e){return null}})();
+function storeSession(s){SESSION=s;try{s?localStorage.setItem('temtur.session',JSON.stringify(s)):localStorage.removeItem('temtur.session')}catch(e){}}
+const withExp=j=>({...j,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600)});
+async function authReq(path,body){let r;try{r=await fetch(SB_URL+'/auth/v1/'+path,{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)})}catch(e){throw{code:'net'}}
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw{code:r.status,error_code:j.error_code||j.code||'',message:j.msg||j.error_description||j.message||j.error||('ошибка '+r.status)};return j}
+let refreshing=null;
+async function token(){if(!SESSION)return null;if(SESSION.expires_at-60>Date.now()/1000)return SESSION.access_token;
+ if(!refreshing)refreshing=authReq('token?grant_type=refresh_token',{refresh_token:SESSION.refresh_token}).then(j=>storeSession(withExp(j))).catch(e=>{if(e.code!=='net')storeSession(null)}).finally(()=>refreshing=null);
+ await refreshing;return SESSION&&SESSION.access_token}
+async function api(method,path,body,prefer){const t=await token();if(!t)throw{code:401,message:'не выполнен вход'};let r;
+ try{r=await fetch(SB_URL+'/rest/v1/'+path,{method,headers:{apikey:SB_KEY,Authorization:'Bearer '+t,'Content-Type':'application/json',...(prefer?{Prefer:prefer}:{})},body:body!==undefined?JSON.stringify(body):undefined})}catch(e){throw{code:'net'}}
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw{code:r.status,message:j.message||r.statusText}}const tx=await r.text();return tx?JSON.parse(tx):null}
+
+/* строки базы ⇄ объекты приложения */
+const nn=v=>v===''||v===undefined?null:v;const num=v=>v===''||v==null?null:Number(v);
+const z=o=>{const r={};for(const[k,v]of Object.entries(o))r[k]=v==null?'':v;return r};
+const chargeRow=c=>({student_id:c.studentId,period:c.period,kind:c.kind,amount:Number(c.amount)||0,due:c.due,detail:nn(c.detail),note:nn(c.note),edited_at:nn(c.editedAt)});
+async function saveX(path,d){const[col,id]=path.split('/');const up='resolution=merge-duplicates,return=minimal';
+ switch(col){
+ case 'config':await api('PATCH','settings?id=eq.1',{school_name:d.schoolName,pay_day:Number(d.payDay)||10,warn_days:Number(d.warnDays)||0,pay_methods:d.payMethods||[],expense_cats:d.expenseCats||[]},'return=minimal');return;
+ case 'teachers':await api('POST','teachers?on_conflict=id',[{id,fio:d.fio,phone:nn(d.phone),iin:nn(d.iin),birth:nn(d.birth),card:nn(d.card),start_date:nn(d.startDate),notes:nn(d.notes)}],up);
+  if(S.canFin)await api('POST','teacher_rates?on_conflict=teacher_id',[{teacher_id:id,rate_ind:Number(d.rateInd)||0,rate_group:Number(d.rateGroup)||0}],up);return;
+ case 'subjects':await api('POST','subjects?on_conflict=id',[{id,name:d.name,teacher_id:nn(d.teacherId),price_ind:Number(d.priceInd)||0,price_group:Number(d.priceGroup)||0}],up);return;
+ case 'students':await api('POST','students?on_conflict=id',[{id,fio:d.fio,birth:nn(d.birth),iin:nn(d.iin),school:nn(d.school),phone:nn(d.phone),parent_fio:nn(d.parentFio),parent_phone:nn(d.parentPhone),address:nn(d.address),notes:nn(d.notes),enroll_date:d.enrollDate,expected_pay_date:nn(d.expectedPayDate),pay_day:num(d.payDay),bill_from:nn(d.billFrom),status:d.status||'active',archived_at:nn(d.archivedAt)}],up);
+  await api('DELETE','enrollments?student_id=eq.'+id);
+  if((d.enr||[]).length)await api('POST','enrollments',d.enr.map(e=>({student_id:id,subject_id:nn(e.subjectId),format:e.format||'group',disc_type:e.discType||'none',disc_val:num(e.discVal),slots:(e.slots||[]).filter(x=>x.d)})),'return=minimal');return;
+ case 'charges':{const[sid,p]=id.split('_');await api('POST','charges?on_conflict=student_id,period',[chargeRow({...d,studentId:sid,period:p})],up);return}
+ case 'payments':await api('POST','payments',[{id,student_id:d.studentId,amount:Number(d.amount),method:nn(d.method),date:d.date,period:nn(d.period),note:nn(d.note)}],'return=minimal');return;
+ case 'expenses':await api('POST','expenses',[{id,date:d.date,cat:nn(d.cat),amount:Number(d.amount),method:nn(d.method),note:nn(d.note),teacher_id:nn(d.teacherId),period:nn(d.period)}],'return=minimal');return;
+ }throw{message:'неизвестная таблица '+col}}
+async function delX(path){const[col,id]=path.split('/');
+ if(col==='charges'){const[sid,p]=id.split('_');return api('DELETE',`charges?student_id=eq.${sid}&period=eq.${p}`)}
+ if(!['students','teachers','subjects','payments','expenses'].includes(col))throw{message:'нельзя удалить'};return api('DELETE',col+'?id=eq.'+id)}
+
+async function loadAll(){const me=(await api('POST','rpc/whoami',{}))[0]||{};S.role=me.role||'none';S.canFin=!!me.can_fin;S.canDel=!!me.can_del;
+ if(S.role!=='owner'&&S.role!=='admin')return false;
+ const g=t=>api('GET',t);
+ const[cfg,teachers,rates,subjects,students,enr,charges,payments,att,exps,users]=await Promise.all([g('settings?select=*'),g('teachers?select=*'),S.canFin?g('teacher_rates?select=*'):[],g('subjects?select=*'),g('students?select=*'),g('enrollments?select=*'),g('charges?select=*'),g('payments?select=*'),g('attendance?select=*'),S.canFin?g('expenses?select=*'):[],S.role==='owner'?api('POST','rpc/owner_users',{}):[]]);
+ const c=cfg[0]||{};S.cfg={...DEF,schoolName:c.school_name||'TEMTUR',payDay:c.pay_day||10,warnDays:c.warn_days??3,payMethods:c.pay_methods||DEF.payMethods,expenseCats:c.expense_cats||DEF.expenseCats,adminFinance:!!c.admin_finance,adminDelete:!!c.admin_delete};
+ const R={};for(const r of rates)R[r.teacher_id]=r;
+ S.teachers=teachers.map(t=>z({id:t.id,fio:t.fio,phone:t.phone,iin:t.iin,birth:t.birth,card:t.card,startDate:t.start_date,notes:t.notes,rateInd:R[t.id]?Number(R[t.id].rate_ind):'',rateGroup:R[t.id]?Number(R[t.id].rate_group):''}));
+ S.subjects=subjects.map(s=>({id:s.id,name:s.name,teacherId:s.teacher_id||'',priceInd:Number(s.price_ind),priceGroup:Number(s.price_group)}));
+ const E={};for(const e of enr)(E[e.student_id]=E[e.student_id]||[]).push({subjectId:e.subject_id||'',format:e.format,discType:e.disc_type,discVal:e.disc_val==null?'':Number(e.disc_val),slots:e.slots||[]});
+ S.students=students.map(s=>({...z({id:s.id,fio:s.fio,birth:s.birth,iin:s.iin,school:s.school,phone:s.phone,parentFio:s.parent_fio,parentPhone:s.parent_phone,address:s.address,notes:s.notes,enrollDate:s.enroll_date,expectedPayDate:s.expected_pay_date,payDay:s.pay_day,billFrom:s.bill_from,status:s.status,archivedAt:s.archived_at,createdAt:s.created_at}),enr:E[s.id]||[]}));
+ S.charges=charges.map(x=>({id:x.student_id+'_'+x.period,studentId:x.student_id,period:x.period,kind:x.kind,amount:Number(x.amount),due:x.due,detail:x.detail||'',note:x.note||'',editedAt:x.edited_at||''}));
+ S.chargeIds=new Set([...S.chargeIds,...S.charges.map(c=>c.id)]);
+ S.payments=payments.map(x=>({id:x.id,studentId:x.student_id,amount:Number(x.amount),method:x.method||'',date:x.date,period:x.period||'',note:x.note||''}));
+ const A={};for(const a of att){(A[a.date]=A[a.date]||{date:a.date,marks:{}}).marks[attKey(a.student_id,a.subject_id,a.time)]=a.mark}S.att=A;
+ S.expenses=exps.map(x=>({id:x.id,date:x.date,cat:x.cat||'',amount:Number(x.amount),method:x.method||'',note:x.note||'',teacherId:x.teacher_id||'',period:x.period||''}));
+ S.users=users;return true}
+
+let busy=null,again=false;
+async function refresh(){if(busy){again=true;return busy}busy=(async()=>{do{again=false;try{const ok=await loadAll();if(!ok){showAuth(S.role==='blocked'?'blocked':'pending');return}setStatus('');S.acc=new Map();render();setTimeout(genCharges,0);
+  if($('#ov').classList.contains('open')&&S.openSt&&!$('#mf'))openStudent(S.openSt)}catch(e){if(e.code===401){storeSession(null);showAuth('login');return}setStatus(e.code==='net'?'Нет связи с сервером. Проверьте интернет — данные обновятся сами.':'Ошибка базы: '+(e.message||e),true)}}while(again)})();
+ try{await busy}finally{busy=null}}
+
+
+/* ---------- вход по имени пользователя (аккаунты создаёт владелец), восстановление пароля владельца ---------- */
+const WEB_URL='https://zumanazarovnurbek51-sudo.github.io/';
+const SITE=/^https?:$/.test(location.protocol)&&!/^(localhost|127\.)/.test(location.hostname)?location.origin+location.pathname:WEB_URL;
+const REDIR='redirect_to='+encodeURIComponent(SITE);
+const loginEmail=v=>{v=String(v||'').trim().toLowerCase();return v.includes('@')?v:v+LOGIN_DOMAIN};
+async function authCall(method,path,body,tok){let r;try{r=await fetch(SB_URL+'/auth/v1/'+path,{method,headers:{apikey:SB_KEY,'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})},body:body?JSON.stringify(body):undefined})}catch(e){throw{code:'net'}}
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw{code:r.status,error_code:j.error_code||j.code||'',message:j.msg||j.error_description||j.message||j.error||('ошибка '+r.status)};return j}
+async function verifyOtp(email,token,types){let last;for(const type of types){try{return await authCall('POST','verify',{type,email,token})}catch(e){last=e;if(e.code==='net')throw e}}throw last}
+function authErr(e){const m=((e&&e.message)||'')+' '+((e&&e.error_code)||'');
+ if(e&&e.code==='net')return 'Нет связи с сервером. Проверьте интернет.';
+ if(/invalid login|invalid_credentials/i.test(m))return 'Неверное имя пользователя или пароль.';
+ if(/banned/i.test(m))return 'Доступ отключён владельцем школы.';
+ if(/expired|otp|invalid token|token has/i.test(m))return 'Код неверный или устарел. Запросите новое письмо.';
+ if(/rate limit|over_email_send_rate_limit|security purposes|too many/i.test(m))return 'Слишком много попыток. Подождите минуту и повторите.';
+ if(/not authorized|error sending|sending/i.test(m))return 'Письмо отправить не удалось. Попросите помощи у того, кто настраивал базу.';
+ if(/reauthentication/i.test(m))return 'Для смены пароля выйдите и войдите заново, затем повторите.';
+ if(/same_password|different from the old/i.test(m))return 'Новый пароль должен отличаться от старого.';
+ if(/weak|should be at least|password/i.test(m))return 'Слишком простой пароль: нужно не меньше 8 символов.';
+ if(/valid email|email address.*invalid|invalid.*email/i.test(m))return 'Проверьте адрес почты.';
+ return 'Ошибка: '+((e&&e.message)||e)}
+const am=(t,ok)=>{const el=$('#authMsg');if(el){el.textContent=t||'';el.className='auth-msg'+(t?(ok?' ok':' err'):'')}};
+function showAuth(state){const el=$('#auth');el.style.display='grid';S.db=null;$('#main').innerHTML='';closeDlg();if(state)S.authMode=state;const m=S.authMode||'login';const em=esc(S.authEmail||'');const se=esc(loginOf(SESSION&&SESSION.user&&SESSION.user.email||S.authEmail||''));
+ const msg='<p class="auth-msg" id="authMsg" role="alert"></p>';
+ const mail=`<label><span class="req">Почта владельца</span><input name="email" type="email" required autocomplete="email" value="${em.includes('@')&&!em.endsWith(LOGIN_DOMAIN)?em:''}"></label>`;
+ const code=`<label><span class="req">Код из письма</span><input name="code" class="code" inputmode="numeric" autocomplete="one-time-code" required pattern="[0-9]{6,10}" maxlength="10"></label>`;
+ const V={
+ login:`<h2>Вход</h2><p class="sub">${esc(S.cfg.schoolName||'TEMTUR')}: база школы</p><form id="authForm" data-f="login"><label><span class="req">Имя пользователя или почта</span><input name="login" required autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(S.authLogin||'')}"></label><label><span class="req">Пароль</span><input name="password" type="password" required autocomplete="current-password"></label>${msg}<button class="pri full" type="submit">Войти</button></form><div class="alt"><button type="button" class="link" data-act="auth-forgot">Забыли пароль?</button></div>`,
+ forgot:`<h2>Забыли пароль?</h2><p class="sub"><b>Сотрудник</b>: попросите владельца школы задать новый пароль в «Настройки → Пользователи → Изменить».</p><p class="sub"><b>Владелец</b>: укажите свою почту, пришлём письмо со ссылкой и кодом.</p><form id="authForm" data-f="forgot">${mail}${msg}<button class="pri full" type="submit">Отправить письмо</button></form><div class="alt"><button type="button" class="link" data-act="auth-login">Назад ко входу</button></div>`,
+ reset:`<h2>Новый пароль</h2><p class="sub">Введите код из письма, отправленного на <b>${em}</b>, и придумайте новый пароль. Можно и просто открыть ссылку из письма.</p><form id="authForm" data-f="reset">${code}<label><span class="req">Новый пароль</span><input name="password" type="password" required minlength="8" autocomplete="new-password"></label>${msg}<button class="pri full" type="submit">Сохранить пароль</button></form><div class="alt"><button type="button" class="link" data-act="auth-forgot">Отправить письмо ещё раз</button><button type="button" class="link" data-act="auth-login">Назад ко входу</button></div>`,
+ newpass:`<h2>Новый пароль</h2><p class="sub">Придумайте новый пароль${se?' для <b>'+se+'</b>':''}.</p><form id="authForm" data-f="newpass"><label><span class="req">Новый пароль, не меньше 8 символов</span><input name="password" type="password" required minlength="8" autocomplete="new-password"></label>${msg}<button class="pri full" type="submit">Сохранить и войти</button></form>`,
+ pending:`<h2>Доступ не включён</h2><p class="sub">Вы вошли как <b>${se}</b>. Владелец школы должен включить вам доступ в разделе «Настройки → Пользователи».</p><button class="pri full" data-act="auth-refresh">Проверить снова</button><div class="alt"><button type="button" class="link" data-act="logout">Выйти</button></div>`,
+ blocked:`<h2>Доступ отключён</h2><p class="sub">Владелец школы отключил доступ для <b>${se}</b>. Если это ошибка, свяжитесь с ним.</p><button class="full" data-act="logout">Выйти</button>`};
+ $('#authCard').innerHTML=V[m]||V.login;const f=$('#authCard input');if(f&&matchMedia('(min-width:901px)').matches)f.focus({preventScroll:true})}
+async function authAction(a,b){
+ if(a==='auth-login'){showAuth('login');return}
+ if(a==='auth-forgot'){showAuth('forgot');return}
+ if(a==='auth-refresh'){boot();return}}
+document.addEventListener('submit',async ev=>{if(ev.target.id!=='authForm')return;ev.preventDefault();const f=ev.target,fd=new FormData(f),k=f.dataset.f;const btn=f.querySelector('[type=submit]');btn.disabled=true;am('');
+ try{const pw=(fd.get('password')||'').toString();const code=(fd.get('code')||'').toString().replace(/\s/g,'');
+  if(k==='login'){S.authLogin=(fd.get('login')||'').toString().trim();const email=loginEmail(S.authLogin);storeSession(withExp(await authCall('POST','token?grant_type=password',{email,password:pw})));await boot();return}
+  const email=(fd.get('email')||S.authEmail||'').toString().trim().toLowerCase();
+  if(k==='forgot'){S.authEmail=email;await authCall('POST','recover?'+REDIR,{email});showAuth('reset');am('Если это почта владельца, письмо уже отправлено.',true);return}
+  if(k==='reset'){if(pw.length<8){am('Пароль: не меньше 8 символов.');return}const j=await verifyOtp(email,code,['recovery']);storeSession(withExp(j));await authCall('PUT','user',{password:pw},j.access_token);toast('Пароль изменён');await boot();return}
+  if(k==='newpass'){if(pw.length<8){am('Пароль: не меньше 8 символов.');return}await authCall('PUT','user',{password:pw},await token());toast('Пароль изменён');await boot();return}
+ }catch(e){am(authErr(e))}finally{btn.disabled=false}});
+
+/* ссылка из письма восстановления приходит с токеном в адресе: #access_token=…&type=recovery */
+async function takeHash(){const h=location.hash.slice(1);if(!/(^|&)(access_token|error_description|error)=/.test(h))return false;const q=new URLSearchParams(h);history.replaceState(null,'',location.pathname+location.search);
+ if(q.get('error')||q.get('error_description')){showAuth('login');am(/expired/i.test(q.get('error_description')||q.get('error_code')||'')?'Ссылка из письма устарела. Запросите новое письмо: «Забыли пароль?».':'Ссылка из письма не сработала: '+(q.get('error_description')||q.get('error')));return true}
+ const s={access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:Number(q.get('expires_in'))||3600,expires_at:Number(q.get('expires_at'))||0,token_type:'bearer'};
+ try{s.user=await authCall('GET','user',null,s.access_token)}catch(e){}
+ storeSession(withExp(s));S.authEmail=s.user&&s.user.email||'';
+ if(q.get('type')==='recovery'){showAuth('newpass');return true}
+ return false}
+
+async function boot(){if(!SESSION){showAuth('login');return}$('#auth').style.display='none';S.db=true;setStatus('Загружаю базу…');
+ const u=SESSION.user||{};const nm=(u.user_metadata&&u.user_metadata.full_name)||loginOf(u.email||S.authLogin||'');
+ $('#who').innerHTML=`${av(nm)}<div class="who-t">${esc(nm)}<span id="roleName"></span></div><button data-act="logout" aria-label="Выйти" title="Выйти">${ic('out')}</button>`;
+ await refresh();if(S.db&&(S.role==='owner'||S.role==='admin'))genCharges()}
+
+function setStatus(t,err){const el=$('#status');if(!t){el.style.display='none';return}el.style.display='';el.textContent=t;el.classList.toggle('err',!!err)}
+if(window.top!==window.self){document.documentElement.innerHTML='';throw new Error('frame')}
+takeHash().then(stop=>{if(!stop)boot()});
+setInterval(()=>{if(S.db&&document.visibilityState==='visible'&&!$('#mf')&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#main form')))refresh()},20000);
+document.addEventListener('visibilitychange',()=>{if(S.db&&document.visibilityState==='visible')refresh()});
+}
+</script>
+</body>
+</html>
