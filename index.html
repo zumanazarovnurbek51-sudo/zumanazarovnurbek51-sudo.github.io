@@ -172,7 +172,7 @@ table.users td{vertical-align:middle}
 .row-acts{display:inline-flex;flex-wrap:wrap;gap:2px 4px;justify-content:flex-end}.row-acts .i{width:16px;height:16px;margin-right:4px;vertical-align:-3px}
 .rights{border-top:1px solid var(--line-2);font-size:13.5px;color:var(--ink-2)}.rights p{margin:0 0 6px}.rights b{color:var(--ink)}
 fieldset.perms{border:1px solid var(--line);border-radius:10px;padding:8px 14px 12px;margin:18px 0 0}fieldset.perms legend{padding:0 6px;font-size:13px;font-weight:600;color:var(--ink-2)}
-.cred{display:grid;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}.cred div{display:flex;justify-content:space-between;gap:16px;align-items:baseline;flex-wrap:wrap}.cred span{color:var(--ink-3);font-size:13px}.cred b{font-size:18px;letter-spacing:.02em;user-select:all;word-break:break-all}
+.cred{display:grid;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}.cred div{display:flex;justify-content:space-between;gap:16px;align-items:baseline;flex-wrap:wrap}.cred span{color:var(--ink-3);font-size:13px}.cred b{font-size:18px;letter-spacing:.02em;user-select:all;word-break:break-all}.cred b.lnk{font-size:13px;font-weight:600;letter-spacing:0}
 .quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px;margin-bottom:18px}
 .quick button{min-height:56px;justify-content:flex-start;padding:0 16px;font-size:15px;background:var(--surface)}
 .quick button svg{width:20px;height:20px;color:var(--azure)}
@@ -260,7 +260,9 @@ dd{margin:2px 0 0;overflow-wrap:anywhere}
 .slot select,.slot input{width:auto;min-height:32px;padding:4px 8px;margin:0;border:0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;max-width:90vw;box-shadow:var(--shadow);font-weight:500}
 .toast.on{opacity:1;transform:translateX(-50%)}
-.no-own .own,.no-fin .fin{display:none!important}
+.no-own .own,.no-fin .fin,.no-plat .plat{display:none!important}
+.subs{background:var(--amber-soft);color:var(--amber);border-radius:10px;padding:11px 14px;margin-bottom:16px;font-weight:600;font-size:14px}.subs.late{background:var(--red-soft);color:var(--red)}
+.late-t{color:var(--red)}
 .no-del [data-act="st-del"],.no-del [data-act="pay-del"],.no-del [data-act="exp-del"],.no-del [data-act="t-del"],.no-del [data-act="s-del"],.no-del [data-act="ch-edit"]{display:none!important}
 
 /* ---------- вход ---------- */
@@ -361,7 +363,7 @@ dd{margin:2px 0 0;overflow-wrap:anywhere}
  <symbol id="i-cog" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
  <symbol id="i-out" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/></symbol>
  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
- <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8.5-8.5M16 7l2.5 2.5M14 9l2 2"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol><symbol id="i-dice" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-school" viewBox="0 0 24 24"><path d="M3 10.5 12 5l9 5.5M5 9.5V19h14V9.5M9.5 19v-4.5h5V19M3 19h18"/></symbol><symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8.5-8.5M16 7l2.5 2.5M14 9l2 2"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol><symbol id="i-dice" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5"/></symbol>
  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
@@ -388,6 +390,7 @@ dd{margin:2px 0 0;overflow-wrap:anywhere}
    <a href="#finance" data-v="finance" class="fin"><svg class="i"><use href="#i-trend"/></svg>Финансы</a>
    <div class="ng own">Управление</div>
    <a href="#nastroiki" data-v="nastroiki" class="own"><svg class="i"><use href="#i-cog"/></svg>Настройки</a>
+   <a href="#schools" data-v="schools" class="plat"><svg class="i"><use href="#i-school"/></svg>Школы</a>
   </nav>
   <div class="me" id="who"></div>
  </aside>
@@ -448,7 +451,7 @@ const fdate=s=>{if(!s)return '—';const[y,m,d]=String(s).split('-');return esc(
 const DEF={schoolName:'TEMTUR',payDay:10,warnDays:3,payMethods:['Наличные','Карта','Перевод Kaspi'],expenseCats:['Аренда','Коммунальные услуги','Интернет','Реклама','Зарплаты','Канцелярия','Ремонт','Налоги']};
 const FMT={ind:'Индивидуально',group:'В группе'};
 const S={role:'none',canFin:false,canDel:false,users:[],authMode:'login',preview:false,db:null,cfg:{...DEF},subjects:[],teachers:[],students:[],charges:[],payments:[],expenses:[],acc:new Map(),fMonth:'',att:{},aDate:'',schT:'',chargeIds:new Set(),got:{},q:'',fSub:'',fTeach:'',fStat:'active',enrDraft:[],pMonth:''};
-const VIEWS=['panel','home','students','payments','schedule','attendance','salary','finance','teachers','subjects','nastroiki'];
+const VIEWS=['panel','home','students','payments','schedule','attendance','salary','finance','teachers','subjects','nastroiki','schools'];
 const pad=n=>String(n).padStart(2,'0');
 const todayS=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
 const ymOf=s=>(s||'').slice(0,7);
@@ -461,7 +464,8 @@ const MONTHS=['январь','февраль','март','апрель','май'
 const fym=p=>{if(!p)return '—';const[y,m]=String(p).split('-');return esc((MONTHS[Number(m)-1]||'')+' '+y)};
 const isAdm=()=>S.role!=='owner'||S.preview;
 const noFin=()=>S.preview||!S.canFin;const noDel=()=>S.preview||!S.canDel;
-const allowed=v=>!(isAdm()&&(v==='home'||v==='nastroiki'))&&!(noFin()&&(v==='salary'||v==='finance'));
+const isPlat=()=>!!S.platform&&!S.preview;
+const allowed=v=>!(isAdm()&&(v==='home'||v==='nastroiki'))&&!(noFin()&&(v==='salary'||v==='finance'))&&!(v==='schools'&&!isPlat());
 const view=()=>{const h=location.hash.slice(1);return VIEWS.includes(h)&&allowed(h)?h:(isAdm()?'panel':'home')};
 
 const sub=id=>S.subjects.find(x=>x.id===id);
@@ -722,20 +726,55 @@ function userEdit(id){const u=S.users.find(x=>x.id===id);if(!u)return;const logi
   try{if(name&&name!==(u.full_name||''))await api('PATCH','profiles?id=eq.'+id,{full_name:name},'return=minimal');
    if(password)await api('POST','rpc/owner_set_password',{uid:id,p_password:password});
    await refresh();if(password)credDlg('Пароль изменён',name||userName(u),login,password);else{closeDlg();toast('Сохранено')}}catch(e){toast(userErr(e))}}}
-function credDlg(title,name,login,password){S.cred=`${S.cfg.schoolName||'TEMTUR'}: вход в базу школы\nИмя для входа: ${login}\nПароль: ${password}`;
- openDlg(title,`<p style="margin:0 0 14px">${name?'<b>'+esc(name)+'</b>: д':'Д'}анные для входа. Передайте их сотруднику.</p><div class="cred"><div><span>Имя для входа</span><b>${esc(login)}</b></div><div><span>Пароль</span><b>${esc(password)}</b></div></div><p class="sample">Пароль больше нигде не показывается. Если сотрудник его забудет, задайте новый: «Изменить» → «Новый пароль».</p><div class="acts"><button type="button" data-act="copy-cred">${ic('copy')}Скопировать для WhatsApp</button><button class="pri" type="button" data-act="close">Готово</button></div>`,true)}
+function credDlg(title,name,login,password,school){S.cred=`${school||S.cfg.schoolName||'TEMTUR'}: вход в базу школы\nСсылка: ${SITE_LINK}\nИмя для входа: ${login}\nПароль: ${password}`;
+ openDlg(title,`<p style="margin:0 0 14px">${name?'<b>'+esc(name)+'</b>: д':'Д'}анные для входа. Передайте их сотруднику.</p><div class="cred"><div><span>Ссылка</span><b class="lnk">${esc(SITE_LINK.replace('https://',''))}</b></div><div><span>Имя для входа</span><b>${esc(login)}</b></div><div><span>Пароль</span><b>${esc(password)}</b></div></div><p class="sample">Пароль больше нигде не показывается. Если сотрудник его забудет, задайте новый: «Изменить» → «Новый пароль».</p><div class="acts"><button type="button" data-act="copy-cred">${ic('copy')}Скопировать для WhatsApp</button><button class="pri" type="button" data-act="close">Готово</button></div>`,true)}
 async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}a.remove();return ok}}
 function myPwForm(){openDlg('Сменить мой пароль',`<form id="mf" autocomplete="off"><label><span class="req">Новый пароль, не меньше 8 символов</span><input name="password" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label><label style="margin-top:14px"><span class="req">Повторите пароль</span><input name="password2" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label><div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сменить пароль</button></div></form>`,true);
  S.onSubmit=async fd=>{const a=(fd.get('password')||'').toString(),b=(fd.get('password2')||'').toString();if(a.length<8){toast('Не меньше 8 символов');return}if(a!==b){toast('Пароли не совпадают');return}
   try{await authCall('PUT','user',{password:a},await token());closeDlg();toast('Пароль изменён')}catch(e){toast(authErr(e))}}}
 
 
-function render(){S.acc=new Map();document.body.classList.toggle('no-own',isAdm());document.body.classList.toggle('no-fin',noFin());document.body.classList.toggle('no-del',noDel());$('#preview').style.display=S.preview?'':'none';const v=view();
+/* ---------- школы (владелец платформы) ---------- */
+const SITE_LINK='https://zumanazarovnurbek51-sudo.github.io/';
+function paidPill(d){if(!d)return '<span class="muted sm">не указано</span>';const left=dayDiff(d,todayS());
+ return `<span class="pill ${left<0?'late':left<=7?'soon':'ok'}">до ${fdate(d)}</span>${left<0?`<br><span class="sm late-t">просрочено ${-left} дн.</span>`:''}`}
+function vSchools(){const L=S.schools||[];const act=L.filter(s=>s.active).length;
+ const row=s=>`<tr class="${s.active?'':'off'}"><td>${whoC(s.name,(s.mine?'ваша школа':'с '+fdate(String(s.created_at).slice(0,10)))+', сотрудников: '+s.staff)}</td><td>${s.director?`<b class="nw">${esc(s.director)}</b><br>`:''}<span class="login">${esc(loginOf(s.director_login||''))||'—'}</span></td><td class="num">${s.students}</td><td class="nw">${s.last_seen?esc(ago(s.last_seen)):'<span class="muted">не входили</span>'}</td><td>${s.mine?'<span class="muted sm">бесплатно</span>':paidPill(s.paid_until)}</td><td>${s.mine?'<span class="muted sm">всегда</span>':`<label class="switch"><input type="checkbox" data-school-active="${esc(s.id)}"${s.active?' checked':''} aria-label="Работает: ${esc(s.name)}"><span>${s.active?'работает':'приостановлена'}</span></label>`}</td><td class="num nolab"><span class="row-acts"><button type="button" class="link" data-act="school-edit" data-id="${esc(s.id)}">Изменить</button>${s.mine||!s.director_id?'':`<button type="button" class="link" data-act="school-pw" data-id="${esc(s.id)}" title="Новый пароль директора">${ic('key')}Пароль</button>`}</span></td></tr>`;
+ return ph('Школы',`${L.length} ${plural(L.length,'школа','школы','школ')}, работают ${act}`,`<button class="pri" data-act="school-new">${ic('plus')}Добавить школу</button>`)+
+ panel('Школы на платформе',`<div class="scroll"><table class="stack schools"><thead><tr><th>Школа</th><th>Директор</th><th class="num">Учеников</th><th>Активность</th><th>Оплачено</th><th>Статус</th><th></th></tr></thead><tbody>${L.map(row).join('')}</tbody></table></div>
+ <div class="panel-b rights"><p>Каждая школа видит только свои данные, это проверяет сервер. Вам здесь видны только название, директор, число учеников и сотрудников и оплата, но не сами данные.</p><p><b>Приостановить</b>: сотрудники школы сразу теряют доступ, данные сохраняются. Включите снова, и всё вернётся.</p><p>Ссылка для входа одна для всех школ: <b>${esc(SITE_LINK)}</b></p></div>`)}
+function schoolForm(){openDlg('Новая школа',`<form id="mf" autocomplete="off"><div class="grid2">
+ <label style="grid-column:1/-1"><span class="req">Название школы</span><input name="name" required maxlength="120"></label>
+ <label style="grid-column:1/-1"><span class="req">Директор: имя и фамилия</span><input name="director" required maxlength="80" data-login-src></label>
+ <label><span class="req">Имя для входа директора</span><input name="login" required minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._\\-]{2,31}" autocapitalize="none" spellcheck="false" data-login-dst><small>латиница, цифры, точка или дефис</small></label>
+ ${pwField('Пароль директора',genPw())}
+ <label>Оплачено до<input name="paid" type="date"><small>можно оставить пустым</small></label></div>
+ <p class="sample">Директор станет владельцем своей школы: сам добавит сотрудников, учеников и настроит всё под себя.</p>
+ <div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Создать школу</button></div></form>`);
+ S.onSubmit=async fd=>{const name=(fd.get('name')||'').toString().trim(),dir=(fd.get('director')||'').toString().trim(),login=(fd.get('login')||'').toString().trim().toLowerCase(),pw=(fd.get('password')||'').toString(),paid=(fd.get('paid')||'').toString();
+  if(!name){toast('Укажите название школы');return}if(!/^[a-z0-9][a-z0-9._-]{2,31}$/.test(login)){toast('Имя для входа: от 3 символов, латиница, цифры, точка или дефис');return}if(pw.length<6){toast('Пароль: не меньше 6 символов');return}
+  try{await api('POST','rpc/platform_create_school',{p_name:name,p_director:dir,p_login:login,p_password:pw,p_paid_until:paid||null});await refresh();credDlg('Школа «'+name+'» создана',dir,login,pw,name)}catch(e){toast(userErr(e))}}}
+function schoolEdit(id){const s=(S.schools||[]).find(x=>x.id===id);if(!s)return;
+ openDlg('Изменить: '+s.name,`<form id="mf" autocomplete="off"><div class="grid2">
+ <label style="grid-column:1/-1"><span class="req">Название школы</span><input name="name" required maxlength="120" value="${esc(s.name)}"></label>
+ ${s.mine?'':`<label>Оплачено до<input name="paid" type="date" value="${esc(s.paid_until||'')}"></label>`}
+ <label style="grid-column:1/-1">Заметка для себя<textarea name="note" maxlength="500" placeholder="например: тариф, контакт, условия">${esc(s.note||'')}</textarea></label></div>
+ <div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сохранить</button></div></form>`);
+ S.onSubmit=async fd=>{const name=(fd.get('name')||'').toString().trim();if(!name){toast('Укажите название школы');return}
+  try{await api('POST','rpc/platform_update_school',{p_id:id,p_name:name,p_active:s.active,p_paid_until:s.mine?s.paid_until:((fd.get('paid')||'').toString()||null),p_note:(fd.get('note')||'').toString()});closeDlg();toast('Сохранено');await refresh()}catch(e){toast(userErr(e))}}}
+function schoolPw(id){const s=(S.schools||[]).find(x=>x.id===id);if(!s||!s.director_id)return;
+ openDlg('Новый пароль директора',`<form id="mf" autocomplete="off"><p style="margin:0 0 14px"><b>${esc(s.director||'Директор')}</b>, ${esc(s.name)}. После смены директор выйдет на всех устройствах и войдёт с новым паролем.</p>${pwField('Новый пароль',genPw())}<div class="acts"><button type="button" data-act="close">Отмена</button><button class="pri" type="submit">Сменить пароль</button></div></form>`,true);
+ S.onSubmit=async fd=>{const pw=(fd.get('password')||'').toString();if(pw.length<6){toast('Пароль: не меньше 6 символов');return}
+  try{await api('POST','rpc/platform_set_password',{p_user:s.director_id,p_password:pw});credDlg('Пароль директора изменён',s.director,loginOf(s.director_login),pw,s.name)}catch(e){toast(userErr(e))}}}
+function subsBanner(){if(S.role!=='owner'||S.platform||S.preview||!S.paidUntil)return '';const left=dayDiff(S.paidUntil,todayS());if(left>7)return '';
+ return `<div class="subs ${left<0?'late':''}">${left<0?`Подписка закончилась ${fdate(S.paidUntil)}. Продлите её, чтобы школа не была приостановлена.`:`Подписка оплачена до ${fdate(S.paidUntil)}${left===0?' — это сегодня':left===1?' — остался 1 день':` — осталось ${left} ${plural(left,'день','дня','дней')}`}. Не забудьте продлить.`}</div>`}
+
+function render(){S.acc=new Map();document.body.classList.toggle('no-own',isAdm());document.body.classList.toggle('no-fin',noFin());document.body.classList.toggle('no-del',noDel());document.body.classList.toggle('no-plat',!isPlat());$('#preview').style.display=S.preview?'':'none';const v=view();
  for(const a of document.querySelectorAll('#nav a,#tabbar a'))a.classList.toggle('on',a.dataset.v===v);
  $('#schoolName').textContent=!S.cfg.schoolName||S.cfg.schoolName==='TEMTUR'?'база школы':S.cfg.schoolName;document.title=(S.cfg.schoolName||'TEMTUR')+' — база школы';
  const rn=$('#roleName');if(rn)rn.textContent=S.role==='owner'?(S.preview?'владелец, вид администратора':'владелец'):S.role==='admin'?'администратор':'';
  const focus=document.activeElement&&document.activeElement.id;const pos=focus==='q'?document.activeElement.selectionStart:null;
- $('#main').innerHTML=({panel:vPanel,home:vHome,students:vStudents,payments:vPayments,salary:vSalary,finance:vFinance,schedule:vSchedule,attendance:vAttendance,teachers:vTeachers,subjects:vSubjects,nastroiki:vCfg})[v]();
+ $('#main').innerHTML=subsBanner()+({panel:vPanel,home:vHome,students:vStudents,payments:vPayments,salary:vSalary,finance:vFinance,schedule:vSchedule,attendance:vAttendance,teachers:vTeachers,subjects:vSubjects,nastroiki:vCfg,schools:vSchools})[v]();
  if(focus==='q'){const q=$('#q');if(q){q.focus();q.setSelectionRange(pos,pos)}}}
 const menu=open=>{$('#side').classList.toggle('open',open);$('#scrim').classList.toggle('open',open)};
 
@@ -845,6 +884,9 @@ document.addEventListener('click',async ev=>{const b=ev.target.closest('[data-ac
  case 'st-del':confirmDlg('Удалить «'+st.fio+'» навсегда вместе с начислениями и оплатами? Это нельзя отменить.',async()=>{for(const c of chargesOf(id))await del('charges/'+c.id);for(const p of paysOf(id))await del('payments/'+p.id);if(await del('students/'+id))toast('Удалён')});break;
  case 'pay-new':payForm(id);break;
  case 'export':if(S.role!=='owner'||S.preview){toast('Только владелец');break}exportXlsx();break;
+ case 'school-new':if(isPlat())schoolForm();break;
+ case 'school-edit':if(isPlat())schoolEdit(id);break;
+ case 'school-pw':if(isPlat())schoolPw(id);break;
  case 'user-new':if(S.role==='owner'&&!S.preview)userForm();break;
  case 'user-edit':if(S.role==='owner'&&!S.preview)userEdit(id);break;
  case 'my-pw':myPwForm();break;
@@ -886,6 +928,9 @@ document.addEventListener('input',ev=>{const t=ev.target;if(t.id==='q'){S.q=t.va
  if(t.matches('[data-login-dst]')){t.dataset.touched='1';const v=t.value.toLowerCase().replace(/\s+/g,'');if(v!==t.value)t.value=v}});
 document.addEventListener('change',async ev=>{const t=ev.target;
  if(t.dataset.accessUser){const on=t.checked;try{await api('PATCH','profiles?id=eq.'+t.dataset.accessUser,{role:on?'admin':'blocked'},'return=minimal');toast(on?'Доступ включён':'Доступ выключен');await refresh()}catch(e){toast(errText(e));t.checked=!on}return}
+ if(t.dataset.schoolActive){const id=t.dataset.schoolActive,on=t.checked,sc=(S.schools||[]).find(x=>x.id===id);if(!sc)return;
+  const go=async()=>{try{await api('POST','rpc/platform_update_school',{p_id:id,p_name:sc.name,p_active:on,p_paid_until:sc.paid_until||null,p_note:sc.note||''});toast(on?'Школа снова работает':'Школа приостановлена');await refresh()}catch(e){toast(userErr(e));t.checked=!on}};
+  if(on)go();else{t.checked=true;confirmDlg('Приостановить «'+sc.name+'»? Сотрудники школы сразу потеряют доступ. Данные сохранятся, включить можно в любой момент.',async()=>{t.checked=false;await go()})}return}
  if(t.dataset.permUser){const on=t.checked,k=t.dataset.perm;if(k!=='can_fin'&&k!=='can_del')return;try{await api('PATCH','profiles?id=eq.'+t.dataset.permUser,{[k]:on},'return=minimal');toast((k==='can_fin'?'Финансы':'Удаление')+': '+(on?'разрешено':'запрещено'));await refresh()}catch(e){toast(errText(e));t.checked=!on}return}if(t.id==='fSub'){S.fSub=t.value;render()}if(t.id==='fTeach'){S.fTeach=t.value;render()}if(t.id==='fStat'){S.fStat=t.value;render()}if(t.id==='pMonth'){S.pMonth=t.value;render()}if(t.id==='aDate'){S.aDate=t.value;render()}if(t.id==='fMonth'){S.fMonth=t.value;render()}if(t.id==='schT'){S.schT=t.value;render()}});
 document.addEventListener('keydown',ev=>{if(ev.key!=='Escape')return;if($('#ov').classList.contains('open'))closeDlg();else menu(false)});
 $('#ov').addEventListener('click',ev=>{if(ev.target.id==='ov')closeDlg()});
@@ -951,7 +996,7 @@ const z=o=>{const r={};for(const[k,v]of Object.entries(o))r[k]=v==null?'':v;retu
 const chargeRow=c=>({student_id:c.studentId,period:c.period,kind:c.kind,amount:Number(c.amount)||0,due:c.due,detail:nn(c.detail),note:nn(c.note),edited_at:nn(c.editedAt)});
 async function saveX(path,d){const[col,id]=path.split('/');const up='resolution=merge-duplicates,return=minimal';
  switch(col){
- case 'config':await api('PATCH','settings?id=eq.1',{school_name:d.schoolName,pay_day:Number(d.payDay)||10,warn_days:Number(d.warnDays)||0,pay_methods:d.payMethods||[],expense_cats:d.expenseCats||[]},'return=minimal');return;
+ case 'config':if(!S.cfgId)throw{message:'настройки школы не найдены'};await api('PATCH','settings?id=eq.'+S.cfgId,{school_name:d.schoolName,pay_day:Number(d.payDay)||10,warn_days:Number(d.warnDays)||0,pay_methods:d.payMethods||[],expense_cats:d.expenseCats||[]},'return=minimal');return;
  case 'teachers':await api('POST','teachers?on_conflict=id',[{id,fio:d.fio,phone:nn(d.phone),iin:nn(d.iin),birth:nn(d.birth),card:nn(d.card),start_date:nn(d.startDate),notes:nn(d.notes)}],up);
   if(S.canFin)await api('POST','teacher_rates?on_conflict=teacher_id',[{teacher_id:id,rate_ind:Number(d.rateInd)||0,rate_group:Number(d.rateGroup)||0}],up);return;
  case 'subjects':await api('POST','subjects?on_conflict=id',[{id,name:d.name,teacher_id:nn(d.teacherId),price_ind:Number(d.priceInd)||0,price_group:Number(d.priceGroup)||0}],up);return;
@@ -966,11 +1011,11 @@ async function delX(path){const[col,id]=path.split('/');
  if(col==='charges'){const[sid,p]=id.split('_');return api('DELETE',`charges?student_id=eq.${sid}&period=eq.${p}`)}
  if(!['students','teachers','subjects','payments','expenses'].includes(col))throw{message:'нельзя удалить'};return api('DELETE',col+'?id=eq.'+id)}
 
-async function loadAll(){const me=(await api('POST','rpc/whoami',{}))[0]||{};S.role=me.role||'none';S.canFin=!!me.can_fin;S.canDel=!!me.can_del;
+async function loadAll(){const me=(await api('POST','rpc/whoami',{}))[0]||{};S.role=me.role||'none';S.canFin=!!me.can_fin;S.canDel=!!me.can_del;S.platform=!!me.platform;S.paidUntil=me.paid_until||'';S.schoolTitle=me.school_name||'';
  if(S.role!=='owner'&&S.role!=='admin')return false;
  const g=t=>api('GET',t);
- const[cfg,teachers,rates,subjects,students,enr,charges,payments,att,exps,users]=await Promise.all([g('settings?select=*'),g('teachers?select=*'),S.canFin?g('teacher_rates?select=*'):[],g('subjects?select=*'),g('students?select=*'),g('enrollments?select=*'),g('charges?select=*'),g('payments?select=*'),g('attendance?select=*'),S.canFin?g('expenses?select=*'):[],S.role==='owner'?api('POST','rpc/owner_users',{}):[]]);
- const c=cfg[0]||{};S.cfg={...DEF,schoolName:c.school_name||'TEMTUR',payDay:c.pay_day||10,warnDays:c.warn_days??3,payMethods:c.pay_methods||DEF.payMethods,expenseCats:c.expense_cats||DEF.expenseCats,adminFinance:!!c.admin_finance,adminDelete:!!c.admin_delete};
+ const[cfg,teachers,rates,subjects,students,enr,charges,payments,att,exps,users,schools]=await Promise.all([g('settings?select=*'),g('teachers?select=*'),S.canFin?g('teacher_rates?select=*'):[],g('subjects?select=*'),g('students?select=*'),g('enrollments?select=*'),g('charges?select=*'),g('payments?select=*'),g('attendance?select=*'),S.canFin?g('expenses?select=*'):[],S.role==='owner'?api('POST','rpc/owner_users',{}):[],S.platform?api('POST','rpc/platform_schools',{}):[]]);
+ const c=cfg[0]||{};S.cfgId=c.id||null;S.schools=schools||[];S.cfg={...DEF,schoolName:c.school_name||'TEMTUR',payDay:c.pay_day||10,warnDays:c.warn_days??3,payMethods:c.pay_methods||DEF.payMethods,expenseCats:c.expense_cats||DEF.expenseCats,adminFinance:!!c.admin_finance,adminDelete:!!c.admin_delete};
  const R={};for(const r of rates)R[r.teacher_id]=r;
  S.teachers=teachers.map(t=>z({id:t.id,fio:t.fio,phone:t.phone,iin:t.iin,birth:t.birth,card:t.card,startDate:t.start_date,notes:t.notes,rateInd:R[t.id]?Number(R[t.id].rate_ind):'',rateGroup:R[t.id]?Number(R[t.id].rate_group):''}));
  S.subjects=subjects.map(s=>({id:s.id,name:s.name,teacherId:s.teacher_id||'',priceInd:Number(s.price_ind),priceGroup:Number(s.price_group)}));
@@ -984,7 +1029,7 @@ async function loadAll(){const me=(await api('POST','rpc/whoami',{}))[0]||{};S.r
  S.users=users;return true}
 
 let busy=null,again=false;
-async function refresh(){if(busy){again=true;return busy}busy=(async()=>{do{again=false;try{const ok=await loadAll();if(!ok){showAuth(S.role==='blocked'?'blocked':'pending');return}setStatus('');S.acc=new Map();render();setTimeout(genCharges,0);
+async function refresh(){if(busy){again=true;return busy}busy=(async()=>{do{again=false;try{const ok=await loadAll();if(!ok){showAuth(S.role==='blocked'?'blocked':S.role==='school_off'?'schooloff':'pending');return}setStatus('');S.acc=new Map();render();setTimeout(genCharges,0);
   if($('#ov').classList.contains('open')&&S.openSt&&!$('#mf'))openStudent(S.openSt)}catch(e){if(e.code===401){storeSession(null);showAuth('login');return}setStatus(e.code==='net'?'Нет связи с сервером. Проверьте интернет — данные обновятся сами.':'Ошибка базы: '+(e.message||e),true)}}while(again)})();
  try{await busy}finally{busy=null}}
 
@@ -1015,11 +1060,12 @@ function showAuth(state){const el=$('#auth');el.style.display='grid';S.db=null;$
  const mail=`<label><span class="req">Почта владельца</span><input name="email" type="email" required autocomplete="email" value="${em.includes('@')&&!em.endsWith(LOGIN_DOMAIN)?em:''}"></label>`;
  const code=`<label><span class="req">Код из письма</span><input name="code" class="code" inputmode="numeric" autocomplete="one-time-code" required pattern="[0-9]{6,10}" maxlength="10"></label>`;
  const V={
- login:`<h2>Вход</h2><p class="sub">${esc(S.cfg.schoolName||'TEMTUR')}: база школы</p><form id="authForm" data-f="login"><label><span class="req">Имя пользователя или почта</span><input name="login" required autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(S.authLogin||'')}"></label><label><span class="req">Пароль</span><input name="password" type="password" required autocomplete="current-password"></label>${msg}<button class="pri full" type="submit">Войти</button></form><div class="alt"><button type="button" class="link" data-act="auth-forgot">Забыли пароль?</button></div>`,
+ login:`<h2>Вход</h2><p class="sub">База частной школы</p><form id="authForm" data-f="login"><label><span class="req">Имя пользователя или почта</span><input name="login" required autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(S.authLogin||'')}"></label><label><span class="req">Пароль</span><input name="password" type="password" required autocomplete="current-password"></label>${msg}<button class="pri full" type="submit">Войти</button></form><div class="alt"><button type="button" class="link" data-act="auth-forgot">Забыли пароль?</button></div>`,
  forgot:`<h2>Забыли пароль?</h2><p class="sub"><b>Сотрудник</b>: попросите владельца школы задать новый пароль в «Настройки → Пользователи → Изменить».</p><p class="sub"><b>Владелец</b>: укажите свою почту, пришлём письмо со ссылкой и кодом.</p><form id="authForm" data-f="forgot">${mail}${msg}<button class="pri full" type="submit">Отправить письмо</button></form><div class="alt"><button type="button" class="link" data-act="auth-login">Назад ко входу</button></div>`,
  reset:`<h2>Новый пароль</h2><p class="sub">Введите код из письма, отправленного на <b>${em}</b>, и придумайте новый пароль. Можно и просто открыть ссылку из письма.</p><form id="authForm" data-f="reset">${code}<label><span class="req">Новый пароль</span><input name="password" type="password" required minlength="8" autocomplete="new-password"></label>${msg}<button class="pri full" type="submit">Сохранить пароль</button></form><div class="alt"><button type="button" class="link" data-act="auth-forgot">Отправить письмо ещё раз</button><button type="button" class="link" data-act="auth-login">Назад ко входу</button></div>`,
  newpass:`<h2>Новый пароль</h2><p class="sub">Придумайте новый пароль${se?' для <b>'+se+'</b>':''}.</p><form id="authForm" data-f="newpass"><label><span class="req">Новый пароль, не меньше 8 символов</span><input name="password" type="password" required minlength="8" autocomplete="new-password"></label>${msg}<button class="pri full" type="submit">Сохранить и войти</button></form>`,
  pending:`<h2>Доступ не включён</h2><p class="sub">Вы вошли как <b>${se}</b>. Владелец школы должен включить вам доступ в разделе «Настройки → Пользователи».</p><button class="pri full" data-act="auth-refresh">Проверить снова</button><div class="alt"><button type="button" class="link" data-act="logout">Выйти</button></div>`,
+ schooloff:`<h2>Школа приостановлена</h2><p class="sub">Доступ для школы${S.schoolTitle?' «<b>'+esc(S.schoolTitle)+'</b>»':''} временно закрыт. Данные сохранены. Чтобы возобновить работу, свяжитесь с владельцем системы.</p><button class="pri full" data-act="auth-refresh">Проверить снова</button><div class="alt"><button type="button" class="link" data-act="logout">Выйти</button></div>`,
  blocked:`<h2>Доступ отключён</h2><p class="sub">Владелец школы отключил доступ для <b>${se}</b>. Если это ошибка, свяжитесь с ним.</p><button class="full" data-act="logout">Выйти</button>`};
  $('#authCard').innerHTML=V[m]||V.login;const f=$('#authCard input');if(f&&matchMedia('(min-width:901px)').matches)f.focus({preventScroll:true})}
 async function authAction(a,b){
